@@ -397,9 +397,58 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .rc-btn.dl:hover { background: #a7f3d0; }
 
 /* ===== JSON ===== */
-.json-hl { background: var(--gray-50); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; display: none; max-height: 360px; overflow-y: auto; }
+.json-hl { background: var(--gray-50); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; display: none; max-height: 400px; overflow-y: auto; }
 .json-hl.show { display: block; }
 .jk { color: #0550ae; } .js { color: #116329; } .jn { color: #953800; } .jb { color: var(--red); } .jnu { color: var(--muted); }
+
+/* ===== JSON TREE VIEW ===== */
+.json-tree-wrap {
+  display: none; margin-top: 12px;
+  background: var(--gray-50); border: 1.5px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.json-tree-wrap.show { display: block; }
+.jt-toolbar {
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+  background: var(--white); border-bottom: 1px solid var(--border);
+}
+.jt-toolbar-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-right: auto; }
+.jt-tbtn {
+  font-size: 11px; padding: 3px 10px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--white);
+  cursor: pointer; color: var(--gray-700); font-family: var(--font);
+  font-weight: 500; transition: all .15s;
+}
+.jt-tbtn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
+.jt-body { padding: 10px 12px; max-height: 440px; overflow-y: auto; overflow-x: auto; }
+.jt-ul { list-style: none; padding-left: 20px; margin: 0; position: relative; }
+.jt-ul.root { padding-left: 2px; }
+.jt-ul:not(.root)::before {
+  content: ''; position: absolute; left: 7px; top: 0; bottom: 6px;
+  border-left: 1px dashed var(--gray-200);
+}
+.jt-li { position: relative; line-height: 1.9; }
+.jt-row { display: flex; align-items: baseline; font-family: var(--mono); font-size: 12.5px; }
+.jt-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; flex-shrink: 0; font-size: 9px;
+  color: var(--gray-400); cursor: pointer; user-select: none;
+  transition: color .12s;
+}
+.jt-arrow:hover { color: var(--blue); }
+.jt-arrow.empty { cursor: default; }
+.jt-key { color: #0550ae; font-weight: 600; }
+.jt-colon { color: var(--gray-400); margin: 0 4px 0 1px; }
+.jt-str { color: #116329; word-break: break-all; }
+.jt-num { color: #953800; font-weight: 500; }
+.jt-bool { color: var(--red); font-weight: 600; }
+.jt-null { color: var(--muted); font-style: italic; }
+.jt-bracket { color: var(--gray-500); font-weight: 700; }
+.jt-meta { color: var(--gray-400); font-size: 11px; margin-left: 5px; font-weight: 400; }
+.jt-header { cursor: pointer; display: inline-flex; align-items: baseline; gap: 0; user-select: none; }
+.jt-header:hover .jt-bracket { color: var(--blue); }
+.jt-children.collapsed { display: none; }
+.jt-more { color: var(--muted); font-size: 11px; padding: 2px 0 2px 18px; font-family: var(--mono); }
 
 /* ===== HASH ===== */
 .hash-alg-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -659,7 +708,7 @@ footer {
       <div class="tool-card">
         <div class="tool-card-header">
           <div class="tool-card-icon" style="background:#fef3c7">📋</div>
-          <div><div class="tool-card-title">JSON 格式化 / 校验</div><div class="tool-card-sub">语法高亮 · 压缩 · 结构校验</div></div>
+          <div><div class="tool-card-title">JSON 格式化 / 校验</div><div class="tool-card-sub">语法高亮 · 树形视图 · 压缩 · 校验</div></div>
           <span class="tool-card-badge ftag green">本地运行</span>
         </div>
         <div class="tool-card-body">
@@ -667,12 +716,21 @@ footer {
           <textarea class="ftextarea" id="j-in" style="min-height:160px" placeholder='{"name":"SamWaf","version":"1.3","open_source":true}'></textarea>
           <div class="fbtns">
             <button class="fbtn blue" onclick="jFmt()">格式化</button>
+            <button class="fbtn teal" onclick="jTree()">🌲 树形视图</button>
             <button class="fbtn" onclick="jCompress()">压缩</button>
             <button class="fbtn" onclick="jValidate()">校验</button>
             <button class="fbtn red" onclick="jClear()">清空</button>
           </div>
           <div id="j-status" class="fresult" style="display:none"></div>
           <div id="j-hl" class="json-hl"></div>
+          <div id="j-tree" class="json-tree-wrap">
+            <div class="jt-toolbar">
+              <span class="jt-toolbar-label">🌲 树形视图</span>
+              <button class="jt-tbtn" onclick="jtExpAll()">全部展开</button>
+              <button class="jt-tbtn" onclick="jtColAll()">全部折叠</button>
+            </div>
+            <div class="jt-body" id="j-tree-body"></div>
+          </div>
           <div class="copy-row"><button class="copy-btn" onclick="copyEl('j-hl')">复制结果</button></div>
         </div>
       </div>
@@ -1060,12 +1118,114 @@ function setupDrop(dzId,fiId,handler){
 }
 
 // ===== JSON =====
-function jFmt(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());const hl=document.getElementById('j-hl');hl.innerHTML=synHl(JSON.stringify(o,null,2));hl.classList.add('show');jSt('✓ JSON 格式有效',true);}catch(e){jSt('✕ 解析失败: '+e.message,false);document.getElementById('j-hl').classList.remove('show');}}
-function jCompress(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());document.getElementById('j-in').value=JSON.stringify(o);document.getElementById('j-hl').classList.remove('show');jSt('✓ 已压缩',true);}catch(e){jSt('✕ '+e.message,false);}}
+function jFmt(){
+  try{
+    const o=JSON.parse(document.getElementById('j-in').value.trim());
+    const hl=document.getElementById('j-hl');
+    hl.innerHTML=synHl(JSON.stringify(o,null,2));
+    hl.classList.add('show');
+    document.getElementById('j-tree').classList.remove('show');
+    jSt('✓ JSON 格式有效',true);
+  }catch(e){jSt('✕ 解析失败: '+e.message,false);document.getElementById('j-hl').classList.remove('show');}
+}
+function jCompress(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());document.getElementById('j-in').value=JSON.stringify(o);document.getElementById('j-hl').classList.remove('show');document.getElementById('j-tree').classList.remove('show');jSt('✓ 已压缩',true);}catch(e){jSt('✕ '+e.message,false);}}
 function jValidate(){try{JSON.parse(document.getElementById('j-in').value.trim());jSt('✓ JSON 结构有效',true);}catch(e){jSt('✕ 无效: '+e.message,false);}}
-function jClear(){document.getElementById('j-in').value='';document.getElementById('j-hl').classList.remove('show');document.getElementById('j-status').style.display='none';}
+function jClear(){document.getElementById('j-in').value='';document.getElementById('j-hl').classList.remove('show');document.getElementById('j-tree').classList.remove('show');document.getElementById('j-status').style.display='none';}
 function jSt(m,ok){const el=document.getElementById('j-status');el.style.display='block';el.textContent=m;el.className='fresult '+(ok?'ok':'err');}
 function synHl(j){return j.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{let c='jn';if(/^"/.test(m)){c=/:$/.test(m)?'jk':'js';}else if(/true|false/.test(m))c='jb';else if(/null/.test(m))c='jnu';return`<span class="${c}">${m.replace(/</g,'&lt;')}</span>`;});}
+
+// ===== JSON Tree View =====
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function jTree(){
+  try{
+    const raw=document.getElementById('j-in').value.trim();
+    if(!raw){jSt('✕ 内容为空',false);return;}
+    const o=JSON.parse(raw);
+    const body=document.getElementById('j-tree-body');
+    body.innerHTML='';
+    const ul=document.createElement('ul');
+    ul.className='jt-ul root';
+    renderJTree(o,ul,null,0);
+    body.appendChild(ul);
+    document.getElementById('j-tree').classList.add('show');
+    document.getElementById('j-hl').classList.remove('show');
+    jSt('✓ 树形视图就绪',true);
+  }catch(e){jSt('✕ 解析失败: '+e.message,false);}
+}
+
+const JT_MAX_ITEMS=500;
+
+function renderJTree(data,parent,key,depth){
+  const li=document.createElement('li');
+  li.className='jt-li';
+  const keyHtml=key!==null?`<span class="jt-key">${escHtml(String(key))}</span><span class="jt-colon">:</span> `:'';
+
+  if(data===null){
+    const row=document.createElement('div');row.className='jt-row';
+    row.innerHTML=`<span class="jt-arrow empty"></span>${keyHtml}<span class="jt-null">null</span>`;
+    li.appendChild(row);parent.appendChild(li);return;
+  }
+  if(typeof data!=='object'){
+    let valHtml;
+    if(typeof data==='string'){
+      const disp=data.length>120?escHtml(data.slice(0,120))+'<span class="jt-meta">…('+data.length+'字符)</span>':escHtml(data);
+      valHtml=`<span class="jt-str">"${disp}"</span>`;
+    }else if(typeof data==='number'){valHtml=`<span class="jt-num">${data}</span>`;}
+    else if(typeof data==='boolean'){valHtml=`<span class="jt-bool">${data}</span>`;}
+    else{valHtml=`<span class="jt-null">${escHtml(String(data))}</span>`;}
+    const row=document.createElement('div');row.className='jt-row';
+    row.innerHTML=`<span class="jt-arrow empty"></span>${keyHtml}${valHtml}`;
+    li.appendChild(row);parent.appendChild(li);return;
+  }
+
+  const isArr=Array.isArray(data);
+  const itemKeys=isArr?null:Object.keys(data);
+  const count=isArr?data.length:itemKeys.length;
+  const ob=isArr?'[':'{';const cb=isArr?']':'}';
+  const autoExp=depth<2;
+
+  const row=document.createElement('div');row.className='jt-row';
+  const arrow=document.createElement('span');
+  arrow.className='jt-arrow';arrow.textContent=autoExp?'▼':'▶';
+
+  const header=document.createElement('span');header.className='jt-header';
+  header.innerHTML=`${keyHtml}<span class="jt-bracket">${ob}</span><span class="jt-meta">${count} ${isArr?'项':'个'}</span>`;
+
+  const childUl=document.createElement('ul');
+  childUl.className='jt-ul jt-children'+(autoExp?'':' collapsed');
+
+  const items=isArr?data:itemKeys;
+  const renderCount=Math.min(count,JT_MAX_ITEMS);
+  for(let i=0;i<renderCount;i++){
+    renderJTree(isArr?items[i]:data[items[i]],childUl,isArr?i:items[i],depth+1);
+  }
+  if(count>JT_MAX_ITEMS){
+    const moreLi=document.createElement('li');moreLi.className='jt-more';
+    moreLi.textContent=`… 还有 ${count-JT_MAX_ITEMS} 项未显示`;
+    childUl.appendChild(moreLi);
+  }
+
+  const toggleFn=()=>{
+    const col=childUl.classList.toggle('collapsed');
+    arrow.textContent=col?'▶':'▼';
+  };
+  arrow.addEventListener('click',toggleFn);
+  header.addEventListener('click',toggleFn);
+
+  row.appendChild(arrow);row.appendChild(header);
+  li.appendChild(row);li.appendChild(childUl);
+  parent.appendChild(li);
+}
+
+function jtExpAll(){
+  document.querySelectorAll('#j-tree-body .jt-children').forEach(el=>el.classList.remove('collapsed'));
+  document.querySelectorAll('#j-tree-body .jt-arrow:not(.empty)').forEach(el=>el.textContent='▼');
+}
+function jtColAll(){
+  document.querySelectorAll('#j-tree-body .jt-children').forEach(el=>el.classList.add('collapsed'));
+  document.querySelectorAll('#j-tree-body .jt-arrow:not(.empty)').forEach(el=>el.textContent='▶');
+}
 
 // ===== Base64 =====
 function b64Enc(){try{document.getElementById('b64-out').value=btoa(unescape(encodeURIComponent(document.getElementById('b64-in').value)));document.getElementById('b64-st').style.display='none';}catch(e){showSt('b64-st','✕ 编码失败: '+e.message,false);}}
