@@ -480,6 +480,44 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .ts-clock-val { font-family: var(--mono); font-size: 42px; font-weight: 700; color: var(--blue); letter-spacing: 2px; }
 .ts-clock-label { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 
+/* ===== QR CODE ===== */
+.qr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:680px){ .qr-layout { grid-template-columns: 1fr; } }
+.qr-preview-wrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--gray-50); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); padding: 24px; min-height: 260px; gap: 16px;
+}
+.qr-canvas-box {
+  background: white; padding: 12px; border-radius: 10px;
+  box-shadow: var(--shadow); display: inline-block; line-height: 0;
+}
+.qr-canvas-box canvas, .qr-canvas-box img { display: block; border-radius: 4px; }
+.qr-placeholder { text-align: center; color: var(--gray-300); }
+.qr-placeholder-icon { font-size: 52px; display: block; margin-bottom: 10px; }
+.qr-placeholder-text { font-size: 13px; color: var(--muted); }
+.qr-dl-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.qr-size-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.qr-size-pill {
+  padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--gray-600); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; font-family: var(--mono);
+}
+.qr-size-pill.active { background: var(--blue-l); border-color: var(--blue); color: var(--blue); }
+.qr-color-row { display: flex; align-items: center; gap: 10px; }
+.qr-color-swatch {
+  width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border);
+  cursor: pointer; padding: 0; overflow: hidden; flex-shrink: 0;
+}
+.qr-color-swatch input[type=color] { width: 40px; height: 40px; border: none; cursor: pointer; transform: translate(-5px,-5px); }
+.qr-ec-row { display: flex; gap: 6px; }
+.qr-ec-btn {
+  padding: 4px 10px; border-radius: 5px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--gray-600); font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.qr-ec-btn.active { background: var(--teal-l); border-color: var(--teal); color: var(--teal); }
+
 /* ===== FOOTER ===== */
 footer {
   border-top: 1px solid var(--border); background: var(--white);
@@ -544,7 +582,7 @@ footer {
       </a>
     </div>
     <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num"><span id="hc-tools">8</span></div><div class="hstat-label">内置工具</div></div>
+      <div class="hstat"><div class="hstat-num"><span id="hc-tools">9</span></div><div class="hstat-label">内置工具</div></div>
       <div class="hstat-div"></div>
       <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-label">本地运行</div></div>
       <div class="hstat-div"></div>
@@ -572,6 +610,9 @@ footer {
     <div class="sidebar-label">安全 / 加密</div>
     <button class="sidebar-item" onclick="nav('hash')"><span class="si-icon">🔑</span>Hash 计算</button>
     <button class="sidebar-item" onclick="nav('pw')"><span class="si-icon">🔒</span>密码生成器</button>
+
+    <div class="sidebar-label">生成工具</div>
+    <button class="sidebar-item" onclick="nav('qr')"><span class="si-icon">📷</span>二维码生成</button>
 
     <!-- WAF promo -->
     <div class="sidebar-waf">
@@ -899,6 +940,82 @@ footer {
 
 
 
+    <!-- ====== QR CODE ====== -->
+    <div id="view-qr" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#f0fdf4">📷</div>
+          <div><div class="tool-card-title">二维码生成器</div><div class="tool-card-sub">本地生成 · 自定义颜色尺寸 · 一键下载 PNG</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="qr-layout">
+            <!-- Left: controls -->
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="fgroup">
+                <label class="flabel">输入内容</label>
+                <textarea class="ftextarea" id="qr-in" style="min-height:100px" placeholder="输入文字、网址、名片等任意内容…&#10;https://samwaf.com"></textarea>
+              </div>
+              <div class="fgroup">
+                <label class="flabel">尺寸 (px)</label>
+                <div class="qr-size-pills" id="qr-sizes">
+                  <button class="qr-size-pill" onclick="qrSetSize(128,this)">128</button>
+                  <button class="qr-size-pill active" onclick="qrSetSize(256,this)">256</button>
+                  <button class="qr-size-pill" onclick="qrSetSize(512,this)">512</button>
+                  <button class="qr-size-pill" onclick="qrSetSize(1024,this)">1024</button>
+                </div>
+              </div>
+              <div class="frow" style="gap:12px">
+                <div class="fgroup">
+                  <label class="flabel">前景色</label>
+                  <div class="qr-color-row">
+                    <div class="qr-color-swatch"><input type="color" id="qr-fg" value="#000000" oninput="qrRender()"></div>
+                    <span id="qr-fg-lbl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">#000000</span>
+                  </div>
+                </div>
+                <div class="fgroup">
+                  <label class="flabel">背景色</label>
+                  <div class="qr-color-row">
+                    <div class="qr-color-swatch"><input type="color" id="qr-bg" value="#ffffff" oninput="qrRender()"></div>
+                    <span id="qr-bg-lbl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">#ffffff</span>
+                  </div>
+                </div>
+              </div>
+              <div class="fgroup">
+                <label class="flabel">纠错级别</label>
+                <div class="qr-ec-row" id="qr-ec-btns">
+                  <button class="qr-ec-btn active" onclick="qrSetEC('L',this)" title="低 ~7%">L</button>
+                  <button class="qr-ec-btn" onclick="qrSetEC('M',this)" title="中 ~15%">M</button>
+                  <button class="qr-ec-btn" onclick="qrSetEC('Q',this)" title="较高 ~25%">Q</button>
+                  <button class="qr-ec-btn" onclick="qrSetEC('H',this)" title="高 ~30%">H</button>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-top:5px">纠错级别越高，可承受损坏越多，但二维码越复杂</div>
+              </div>
+              <div class="fbtns">
+                <button class="fbtn blue" onclick="qrRender()">生成二维码</button>
+                <button class="fbtn red" onclick="qrClear()">清空</button>
+              </div>
+            </div>
+            <!-- Right: preview -->
+            <div class="qr-preview-wrap" id="qr-preview-wrap">
+              <div class="qr-placeholder" id="qr-placeholder">
+                <span class="qr-placeholder-icon">📷</span>
+                <div class="qr-placeholder-text">输入内容后点击生成</div>
+              </div>
+              <div class="qr-canvas-box" id="qr-canvas-box" style="display:none">
+                <div id="qr-output"></div>
+              </div>
+              <div class="qr-dl-row" id="qr-dl-row" style="display:none">
+                <button class="fbtn green" onclick="qrDownload()">⬇ 下载 PNG</button>
+                <button class="fbtn" onclick="qrCopy()">复制图片</button>
+              </div>
+            </div>
+          </div>
+          <div id="qr-status" class="fresult" style="display:none;margin-top:12px"></div>
+        </div>
+      </div>
+    </div><!-- /qr -->
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -916,6 +1033,7 @@ footer {
   </div>
 </footer>
 
+<script src="js/qrcode.min.js"></script>
 <script>
 // ===== State =====
 const S = {
@@ -1336,6 +1454,99 @@ function pwBatch(){
   for(let i=0;i<count;i++){const arr=new Uint32Array(len);crypto.getRandomValues(arr);pws.push(Array.from(arr).map(n=>ch[n%ch.length]).join(''));}
   const el=document.getElementById('pw-batch');el.style.display='block';el.value=pws.join('\n');
 }
+
+// ===== QR Code =====
+const QR = { size: 256, ec: 'L', inst: null };
+
+function qrSetSize(s, btn) {
+  QR.size = s;
+  document.querySelectorAll('.qr-size-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  qrRender();
+}
+function qrSetEC(ec, btn) {
+  QR.ec = ec;
+  document.querySelectorAll('.qr-ec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  qrRender();
+}
+
+function qrRender() {
+  const text = document.getElementById('qr-in').value.trim();
+  if (!text) { qrSt('✕ 请输入内容', false); return; }
+  const fg = document.getElementById('qr-fg').value;
+  const bg = document.getElementById('qr-bg').value;
+  document.getElementById('qr-fg-lbl').textContent = fg;
+  document.getElementById('qr-bg-lbl').textContent = bg;
+  const ecMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+  const box = document.getElementById('qr-output');
+  box.innerHTML = '';
+  try {
+    QR.inst = new QRCode(box, {
+      text: text,
+      width: QR.size,
+      height: QR.size,
+      colorDark: fg,
+      colorLight: bg,
+      correctLevel: ecMap[QR.ec]
+    });
+    document.getElementById('qr-placeholder').style.display = 'none';
+    document.getElementById('qr-canvas-box').style.display = 'inline-block';
+    document.getElementById('qr-dl-row').style.display = 'flex';
+    document.getElementById('qr-status').style.display = 'none';
+  } catch(e) {
+    qrSt('✕ 生成失败: ' + e.message, false);
+  }
+}
+
+function qrDownload() {
+  const canvas = document.querySelector('#qr-output canvas');
+  if (!canvas) { qrSt('✕ 请先生成二维码', false); return; }
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'qrcode_' + QR.size + 'x' + QR.size + '.png';
+  a.click();
+}
+
+async function qrCopy() {
+  const canvas = document.querySelector('#qr-output canvas');
+  if (!canvas) { qrSt('✕ 请先生成二维码', false); return; }
+  try {
+    canvas.toBlob(async blob => {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      qrSt('✓ 图片已复制到剪贴板', true);
+    });
+  } catch(e) {
+    qrSt('✕ 复制失败（浏览器限制）: ' + e.message, false);
+  }
+}
+
+function qrClear() {
+  document.getElementById('qr-in').value = '';
+  document.getElementById('qr-output').innerHTML = '';
+  document.getElementById('qr-placeholder').style.display = 'block';
+  document.getElementById('qr-canvas-box').style.display = 'none';
+  document.getElementById('qr-dl-row').style.display = 'none';
+  document.getElementById('qr-status').style.display = 'none';
+}
+
+function qrSt(m, ok) {
+  const el = document.getElementById('qr-status');
+  el.style.display = 'block'; el.textContent = m;
+  el.className = 'fresult ' + (ok ? 'ok' : 'err');
+}
+
+// Auto-render on input
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('qr-in');
+  if (ta) {
+    let qrTimer;
+    ta.addEventListener('input', () => {
+      clearTimeout(qrTimer);
+      qrTimer = setTimeout(() => { if (ta.value.trim()) qrRender(); }, 600);
+    });
+  }
+});
 
 // ===== Shared copy =====
 function copyEl(id){const el=document.getElementById(id);const t=el.value!==undefined?el.value:el.innerText;navigator.clipboard.writeText(t);}
