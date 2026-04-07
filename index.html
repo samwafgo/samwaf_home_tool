@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SamWaf Tools — 开发者工具集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --white:    #ffffff;
+  --gray-50:  #f8f9fb;
+  --gray-100: #f0f2f5;
+  --gray-200: #e2e6ea;
+  --gray-300: #c8cdd4;
+  --gray-400: #9aa0aa;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --blue:     #2563eb;
+  --blue-l:   #dbeafe;
+  --blue-d:   #1d4ed8;
+  --teal:     #0d9488;
+  --teal-l:   #ccfbf1;
+  --red:      #dc2626;
+  --red-l:    #fee2e2;
+  --amber:    #d97706;
+  --amber-l:  #fef3c7;
+  --green:    #059669;
+  --green-l:  #d1fae5;
+  --surface:  var(--white);
+  --bg:       var(--gray-50);
+  --border:   var(--gray-200);
+  --text:     var(--gray-900);
+  --muted:    var(--gray-500);
+  --r:        10px;
+  --r-lg:     16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow:    0 4px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --font:      'Plus Jakarta Sans', sans-serif;
+  --mono:      'JetBrains Mono', monospace;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
+
+/* ===== NAV ===== */
+nav {
+  position: sticky; top: 0; z-index: 800;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; height: 58px; padding: 0 24px; gap: 0;
+}
+.nav-brand { display: flex; align-items: center; gap: 9px; text-decoration: none; margin-right: auto; }
+.nav-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 800; font-size: 13px; letter-spacing: .5px;
+}
+.nav-name { font-weight: 800; font-size: 17px; color: var(--gray-900); letter-spacing: -.3px; }
+.nav-name span { color: var(--blue); }
+.nav-pill {
+  background: var(--blue-l); color: var(--blue); font-size: 10px;
+  font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 6px;
+  letter-spacing: .04em;
+}
+.nav-links { display: flex; gap: 2px; }
+.nav-a {
+  padding: 6px 13px; border-radius: 7px; text-decoration: none;
+  color: var(--gray-500); font-size: 13px; font-weight: 500; transition: all .18s;
+}
+.nav-a:hover { color: var(--blue); background: var(--blue-l); }
+.nav-gh {
+  margin-left: 10px; padding: 7px 16px; border-radius: 7px; text-decoration: none;
+  background: var(--gray-900); color: white; font-size: 12px; font-weight: 600;
+  transition: background .18s; display: flex; align-items: center; gap: 6px;
+}
+.nav-gh:hover { background: var(--gray-700); }
+
+/* ===== HERO ===== */
+#hero {
+  padding: 72px 24px 64px;
+  text-align: center;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+/* Decorative grid dots */
+#hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, var(--gray-200) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: .5; pointer-events: none;
+  mask-image: radial-gradient(ellipse 70% 60% at center, transparent 30%, black 100%);
+}
+.hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 20px;
+  background: var(--blue-l); color: var(--blue);
+  font-size: 12px; font-weight: 600; letter-spacing: .03em; margin-bottom: 24px;
+}
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+.hero-title {
+  font-size: clamp(36px, 6vw, 60px); font-weight: 800; line-height: 1.1;
+  letter-spacing: -.03em; color: var(--gray-900); margin-bottom: 18px;
+}
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-desc {
+  font-size: 16px; color: var(--muted); max-width: 520px; margin: 0 auto 32px;
+  font-weight: 400; line-height: 1.75;
+}
+.hero-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  padding: 11px 24px; border-radius: 9px; background: var(--blue); color: white;
+  font-weight: 600; font-size: 14px; text-decoration: none; border: none; cursor: pointer;
+  transition: all .18s; display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-primary:hover { background: var(--blue-d); box-shadow: 0 4px 16px rgba(37,99,235,.3); transform: translateY(-1px); }
+.btn-secondary {
+  padding: 11px 24px; border-radius: 9px; background: var(--white); color: var(--gray-700);
+  font-weight: 600; font-size: 14px; text-decoration: none; border: 1.5px solid var(--border); cursor: pointer;
+  transition: all .18s; display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+.hero-stats {
+  display: flex; gap: 32px; justify-content: center; margin-top: 44px; flex-wrap: wrap;
+}
+.hstat { text-align: center; }
+.hstat-num { font-size: 26px; font-weight: 800; color: var(--gray-900); letter-spacing: -.02em; }
+.hstat-num span { color: var(--blue); }
+.hstat-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: .04em; margin-top: 2px; }
+.hstat-div { width: 1px; background: var(--border); align-self: stretch; }
+
+/* ===== MAIN LAYOUT ===== */
+.main { max-width: 1160px; margin: 0 auto; padding: 40px 24px 80px; display: flex; gap: 24px; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px; flex-shrink: 0; position: sticky; top: 78px; align-self: flex-start;
+}
+.sidebar-section { margin-bottom: 6px; }
+.sidebar-label {
+  font-size: 10px; font-weight: 700; color: var(--gray-400); letter-spacing: .1em;
+  text-transform: uppercase; padding: 0 12px; margin-bottom: 4px; margin-top: 16px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 8px;
+  cursor: pointer; transition: all .15s; color: var(--gray-600); font-size: 13px; font-weight: 500;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.sidebar-item:hover { background: var(--gray-100); color: var(--gray-900); }
+.sidebar-item.active { background: var(--blue-l); color: var(--blue); font-weight: 600; }
+.sidebar-item .si-icon { font-size: 15px; width: 20px; text-align: center; }
+.sidebar-waf {
+  margin-top: 24px; padding: 14px; border-radius: var(--r-lg);
+  background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+  border: 1px solid var(--blue-l);
+}
+.sidebar-waf-name { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+.sidebar-waf-desc { font-size: 11px; color: var(--gray-500); line-height: 1.5; }
+.sidebar-waf-link {
+  display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 600;
+  color: var(--blue); text-decoration: none;
+}
+.sidebar-waf-link:hover { text-decoration: underline; }
+
+/* ===== CONTENT ===== */
+.content { flex: 1; min-width: 0; }
+.tool-view { display: none; }
+.tool-view.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* Tool card wrapper */
+.tool-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.tool-card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 11px;
+  background: var(--white);
+}
+.tool-card-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.tool-card-title { font-weight: 700; font-size: 15px; color: var(--gray-900); }
+.tool-card-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.tool-card-badge {
+  margin-left: auto; padding: 3px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+}
+.tool-card-body { padding: 20px; }
+
+/* ===== FORM ELEMENTS ===== */
+label.flabel {
+  display: block; font-size: 11px; font-weight: 700; color: var(--gray-500);
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px;
+}
+.finput, .ftextarea, .fselect {
+  width: 100%; padding: 10px 13px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: var(--white);
+  font-family: var(--mono); font-size: 13px; color: var(--gray-900);
+  outline: none; transition: border-color .18s; resize: vertical;
+}
+.finput:focus, .ftextarea:focus, .fselect:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.ftextarea { min-height: 120px; line-height: 1.65; }
+.fselect { cursor: pointer; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:680px){ .frow{grid-template-columns:1fr} }
+.fgroup { display: flex; flex-direction: column; }
+
+.fbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.fbtn {
+  padding: 8px 18px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--gray-700); font-family: var(--font);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.fbtn:hover { border-color: var(--gray-300); background: var(--gray-50); }
+.fbtn.blue { background: var(--blue); color: white; border-color: var(--blue); }
+.fbtn.blue:hover { background: var(--blue-d); border-color: var(--blue-d); }
+.fbtn.teal { background: var(--teal); color: white; border-color: var(--teal); }
+.fbtn.teal:hover { filter: brightness(.9); }
+.fbtn.red { background: var(--red-l); color: var(--red); border-color: transparent; }
+.fbtn.red:hover { background: #fecaca; }
+.fbtn.green { background: var(--green-l); color: var(--green); border-color: transparent; }
+.fbtn.green:hover { background: #a7f3d0; }
+
+/* Result area */
+.fresult {
+  margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: var(--gray-50);
+  font-family: var(--mono); font-size: 12.5px; color: var(--gray-900);
+  word-break: break-all; white-space: pre-wrap; min-height: 44px; line-height: 1.75;
+}
+.fresult.ok  { border-color: #86efac; background: var(--green-l); color: #065f46; }
+.fresult.err { border-color: #fca5a5; background: var(--red-l);   color: var(--red); }
+.copy-row { display: flex; justify-content: flex-end; margin-top: 6px; }
+.copy-btn {
+  font-size: 11px; color: var(--muted); background: none; border: none;
+  cursor: pointer; padding: 3px 8px; border-radius: 5px; font-family: var(--font);
+  transition: color .15s; font-weight: 500;
+}
+.copy-btn:hover { color: var(--blue); }
+
+/* Divider */
+.fdiv { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* Tag */
+.ftag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600;
+}
+.ftag.blue { background: var(--blue-l); color: var(--blue); }
+.ftag.green { background: var(--green-l); color: var(--green); }
+.ftag.red { background: var(--red-l); color: var(--red); }
+.ftag.amber { background: var(--amber-l); color: var(--amber); }
+
+/* ===== IMAGE TOOL ===== */
+.img-dropzone {
+  border: 2px dashed var(--border); border-radius: var(--r-lg);
+  padding: 44px 24px; text-align: center; cursor: pointer; transition: all .2s;
+  background: var(--gray-50); position: relative; overflow: hidden;
+}
+.img-dropzone:hover, .img-dropzone.drag { border-color: var(--blue); background: var(--blue-l); }
+.img-dropzone-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+.img-dropzone h3 { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.img-dropzone p { font-size: 12px; color: var(--muted); }
+
+.img-mode-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.img-tab {
+  padding: 7px 16px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--gray-600); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.img-tab.active { background: var(--blue-l); border-color: var(--blue); color: var(--blue); }
+
+.img-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+@media(max-width:600px){.img-controls{grid-template-columns:1fr}}
+.ctrl-block {
+  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--r); padding: 14px;
+}
+.ctrl-block-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.range-row { display: flex; align-items: center; gap: 10px; }
+input[type=range] {
+  -webkit-appearance: none; flex: 1; height: 4px; background: var(--gray-200);
+  border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--blue); cursor: pointer; box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  transition: transform .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.range-val { font-family: var(--mono); font-weight: 600; font-size: 16px; color: var(--blue); min-width: 36px; text-align: right; }
+.fmt-pills { display: flex; gap: 6px; }
+.fmt-pill {
+  flex: 1; padding: 7px 4px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--muted); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; text-align: center;
+}
+.fmt-pill.active { background: var(--blue-l); border-color: var(--blue); color: var(--blue); }
+
+.img-list { display: flex; flex-direction: column; gap: 10px; }
+.img-row {
+  display: grid; grid-template-columns: 64px 1fr auto; gap: 12px;
+  align-items: center; padding: 12px; background: var(--gray-50);
+  border: 1px solid var(--border); border-radius: var(--r);
+  animation: fadeUp .25s ease;
+}
+.img-row-thumb { width: 64px; height: 48px; border-radius: 7px; object-fit: cover; border: 1px solid var(--border); }
+.img-row-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+.size-tag { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+.size-saved { font-weight: 700; color: var(--green); }
+.progress-track { height: 3px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--teal)); border-radius: 2px; width: 0; transition: width .4s ease; }
+.dl-btn {
+  padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
+  background: var(--green-l); color: var(--green); border: 1px solid #a7f3d0;
+  text-decoration: none; transition: all .15s; white-space: nowrap;
+}
+.dl-btn:hover { background: #a7f3d0; }
+
+/* Merge slots */
+.merge-scene-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.scene-btn {
+  padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--gray-600); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.scene-btn.active { border-color: var(--amber); background: var(--amber-l); color: var(--amber); }
+.merge-slot {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  border: 1.5px dashed var(--border); border-radius: var(--r);
+  cursor: pointer; transition: border-color .18s; margin-bottom: 8px;
+}
+.merge-slot:hover { border-color: var(--blue); }
+.merge-slot.filled { border-style: solid; border-color: var(--blue); background: var(--gray-50); }
+.slot-num {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gray-200); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.slot-num.filled { background: var(--blue); color: white; }
+.slot-preview { width: 80px; height: 52px; border-radius: 7px; object-fit: cover; border: 1px solid var(--border); }
+.slot-meta { flex: 1; min-width: 0; }
+.slot-label { font-weight: 600; font-size: 13px; }
+.slot-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.slot-rot-bar { display: flex; gap: 5px; margin-top: 6px; }
+.rot-btn {
+  padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border);
+  background: var(--white); font-size: 11px; cursor: pointer; transition: all .15s; color: var(--gray-700);
+}
+.rot-btn:hover { border-color: var(--blue); color: var(--blue); }
+.slot-del {
+  padding: 5px 9px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--white); font-size: 12px; cursor: pointer; color: var(--muted);
+  transition: all .15s;
+}
+.slot-del:hover { border-color: var(--red); color: var(--red); background: var(--red-l); }
+
+.merge-preview-box {
+  margin-top: 14px; border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden; display: none;
+}
+.mpb-header { padding: 9px 14px; background: var(--gray-50); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.mpb-img { width: 100%; max-height: 280px; object-fit: contain; display: block; padding: 12px; }
+
+/* Rotate grid */
+.rotate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+.rot-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.rot-card-img-wrap { aspect-ratio: 4/3; background: var(--gray-100); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.rot-card-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s; }
+.rot-card-body { padding: 9px 10px; }
+.rot-card-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 7px; }
+.rot-card-btns { display: flex; gap: 4px; }
+.rc-btn {
+  flex: 1; padding: 5px 2px; border-radius: 5px; border: 1px solid var(--border);
+  font-size: 12px; cursor: pointer; background: var(--white); transition: all .15s; text-align: center; color: var(--gray-700);
+}
+.rc-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
+.rc-btn.dl { background: var(--green-l); color: var(--green); border-color: transparent; }
+.rc-btn.dl:hover { background: #a7f3d0; }
+
+/* ===== JSON ===== */
+.json-hl { background: var(--gray-50); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; display: none; max-height: 360px; overflow-y: auto; }
+.json-hl.show { display: block; }
+.jk { color: #0550ae; } .js { color: #116329; } .jn { color: #953800; } .jb { color: var(--red); } .jnu { color: var(--muted); }
+
+/* ===== HASH ===== */
+.hash-alg-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.hash-chk { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--gray-700); cursor: pointer; }
+.hash-chk input { accent-color: var(--blue); }
+.hash-result-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.hash-row { padding: 10px 14px; background: var(--gray-50); border: 1px solid var(--border); border-radius: 8px; }
+.hash-algo { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.hash-val { font-family: var(--mono); font-size: 12px; color: var(--gray-900); word-break: break-all; }
+
+/* ===== PASSWORD ===== */
+.pw-result-display {
+  font-family: var(--mono); font-size: 18px; font-weight: 600; letter-spacing: 2px;
+  padding: 16px; background: var(--gray-50); border: 1.5px solid var(--border);
+  border-radius: 8px; word-break: break-all; color: var(--gray-900); margin: 12px 0;
+}
+.pw-str-bar { height: 5px; background: var(--gray-200); border-radius: 3px; overflow: hidden; margin: 6px 0 4px; }
+.pw-str-fill { height: 100%; border-radius: 3px; width: 0; transition: width .4s, background .4s; }
+.pw-str-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+.pw-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+.pw-opt { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.pw-opt input { accent-color: var(--blue); }
+
+/* ===== TIMESTAMP ===== */
+.ts-clock {
+  text-align: center; padding: 20px; background: linear-gradient(135deg, var(--blue-l), #f0fdf4);
+  border: 1px solid var(--blue-l); border-radius: var(--r-lg); margin-bottom: 20px;
+}
+.ts-clock-val { font-family: var(--mono); font-size: 42px; font-weight: 700; color: var(--blue); letter-spacing: 2px; }
+.ts-clock-label { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border); background: var(--white);
+  padding: 24px 24px; text-align: center;
+}
+.footer-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-brand { font-weight: 800; font-size: 15px; color: var(--gray-900); }
+.footer-brand span { color: var(--blue); }
+.footer-links { display: flex; gap: 20px; }
+.footer-link { font-size: 12px; color: var(--muted); text-decoration: none; transition: color .15s; font-weight: 500; }
+.footer-link:hover { color: var(--blue); }
+.footer-copy { font-size: 12px; color: var(--gray-400); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+/* Responsive sidebar */
+@media(max-width:800px){
+  .main { flex-direction: column; }
+  .sidebar { width: 100%; position: static; }
+  .sidebar-items { display: flex; flex-wrap: wrap; gap: 4px; }
+  .sidebar-item { width: auto; }
+  .sidebar-waf { display: none; }
+  .sidebar-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="nav-mark">SW</div>
+    <span class="nav-name">Sam<span>Waf</span></span>
+    <span class="nav-pill">TOOLS</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-a" href="#tools">工具</a>
+    <a class="nav-a" href="https://doc.samwaf.com" target="_blank">文档</a>
+    <a class="nav-a" href="https://github.com/samwafgo/SamWaf" target="_blank">关于</a>
+  </div>
+  <a class="nav-gh" href="https://github.com/samwafgo/SamWaf" target="_blank">
+    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    GitHub
+  </a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>免费开源 · 本地运行 · 零数据上传</div>
+    <h1 class="hero-title">开发者<em>安全工具集</em><br>由 SamWaf 出品</h1>
+    <p class="hero-desc">集合图片处理、编码转换、Hash计算、密码生成等常用工具，所有计算均在浏览器本地完成，数据从不离开你的设备。</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#tools">🛠 开始使用工具</a>
+      <a class="btn-secondary" href="https://github.com/samwafgo/SamWaf" target="_blank">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        SamWaf WAF
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-num"><span id="hc-tools">8</span></div><div class="hstat-label">内置工具</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-label">本地运行</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num">0</div><div class="hstat-label">数据上传</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num"><span>Free</span></div><div class="hstat-label">完全免费</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="main" id="tools">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">图片处理</div>
+    <button class="sidebar-item active" onclick="nav('img')"><span class="si-icon">🖼</span>图片工具</button>
+
+    <div class="sidebar-label">编码 / 转换</div>
+    <button class="sidebar-item" onclick="nav('json')"><span class="si-icon">📋</span>JSON 格式化</button>
+    <button class="sidebar-item" onclick="nav('base64')"><span class="si-icon">🔤</span>Base64 编解码</button>
+    <button class="sidebar-item" onclick="nav('url')"><span class="si-icon">🔗</span>URL 编解码</button>
+    <button class="sidebar-item" onclick="nav('ts')"><span class="si-icon">⏱</span>时间戳转换</button>
+
+    <div class="sidebar-label">安全 / 加密</div>
+    <button class="sidebar-item" onclick="nav('hash')"><span class="si-icon">🔑</span>Hash 计算</button>
+    <button class="sidebar-item" onclick="nav('pw')"><span class="si-icon">🔒</span>密码生成器</button>
+
+    <!-- WAF promo -->
+    <div class="sidebar-waf">
+      <div class="sidebar-waf-name">🛡 SamWaf WAF</div>
+      <div class="sidebar-waf-desc">开源轻量级网站防火墙，私有化部署，拦截 SQL注入、XSS、扫描器攻击。</div>
+      <a class="sidebar-waf-link" href="https://github.com/samwafgo/SamWaf" target="_blank">了解更多 →</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ====== IMAGE TOOL ====== -->
+    <div id="view-img" class="tool-view active">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#eff6ff">🖼</div>
+          <div><div class="tool-card-title">图片工具</div><div class="tool-card-sub">压缩 · 合并 · 旋转 · 本地处理</div></div>
+          <span class="tool-card-badge ftag blue">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <!-- Mode tabs -->
+          <div class="img-mode-tabs">
+            <button class="img-tab active" onclick="imgMode('compress',this)">🗜 压缩</button>
+            <button class="img-tab" onclick="imgMode('merge',this)">🔗 合并</button>
+            <button class="img-tab" onclick="imgMode('rotate',this)">🔄 旋转</button>
+          </div>
+
+          <!-- COMPRESS -->
+          <div id="img-compress">
+            <div class="img-dropzone" id="dz-c" onclick="document.getElementById('fi-c').click()">
+              <span class="img-dropzone-icon">📁</span>
+              <h3>拖拽图片或点击选择</h3>
+              <p>支持 JPG / PNG，可多选批量处理</p>
+            </div>
+            <input type="file" id="fi-c" style="display:none" accept="image/jpeg,image/png" multiple>
+            <div class="img-controls">
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">压缩质量</div>
+                <div class="range-row">
+                  <input type="range" id="c-q" min="10" max="95" value="75" oninput="document.getElementById('c-qv').textContent=this.value">
+                  <span class="range-val" id="c-qv">75</span>
+                </div>
+              </div>
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">输出格式</div>
+                <div class="fmt-pills" id="c-fmts">
+                  <button class="fmt-pill active" onclick="setFmt('c','jpeg',this)">JPG</button>
+                  <button class="fmt-pill" onclick="setFmt('c','png',this)">PNG</button>
+                  <button class="fmt-pill" onclick="setFmt('c','webp',this)">WebP</button>
+                </div>
+              </div>
+            </div>
+            <div class="img-list" id="c-list"></div>
+            <button id="c-dlall" onclick="cDlAll()" style="display:none;margin-top:12px;" class="fbtn blue">⬇ 全部下载</button>
+          </div>
+
+          <!-- MERGE -->
+          <div id="img-merge" style="display:none">
+            <div class="merge-scene-bar">
+              <button class="scene-btn active" onclick="mergeScene('custom',this)">自定义</button>
+              <button class="scene-btn" onclick="mergeScene('id',this)">🪪 身份证正反面</button>
+              <button class="scene-btn" onclick="mergeScene('bank',this)">💳 银行卡正反面</button>
+              <button class="scene-btn" onclick="mergeScene('passport',this)">📄 护照双页</button>
+            </div>
+            <div class="img-controls">
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">排列方式</div>
+                <div class="fmt-pills" id="m-layout-btns">
+                  <button class="fmt-pill active" onclick="setMLayout('v',this)">⬇ 上下</button>
+                  <button class="fmt-pill" onclick="setMLayout('h',this)">➡ 左右</button>
+                  <button class="fmt-pill" onclick="setMLayout('g',this)">⊞ 网格</button>
+                </div>
+              </div>
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">间距 & 格式</div>
+                <div class="range-row" style="margin-bottom:8px">
+                  <input type="range" id="m-gap" min="0" max="60" value="10" oninput="document.getElementById('m-gv').textContent=this.value;mPreview()">
+                  <span class="range-val" id="m-gv" style="font-size:14px">10</span>
+                </div>
+                <div class="fmt-pills" id="m-fmts">
+                  <button class="fmt-pill active" onclick="setFmt('m','jpeg',this)">JPG</button>
+                  <button class="fmt-pill" onclick="setFmt('m','png',this)">PNG</button>
+                  <button class="fmt-pill" onclick="setFmt('m','webp',this)">WebP</button>
+                </div>
+              </div>
+            </div>
+            <div id="m-slots"></div>
+            <button class="fbtn" style="margin-top:4px" onclick="addMSlot()">＋ 添加图片</button>
+            <div class="merge-preview-box" id="m-prev-box">
+              <div class="mpb-header">合并预览</div>
+              <img class="mpb-img" id="m-prev-img" alt="">
+            </div>
+            <div class="fbtns" style="margin-top:12px">
+              <button class="fbtn blue" onclick="mDownload()">⬇ 下载合并图片</button>
+            </div>
+            <input type="file" id="fi-m" style="display:none" accept="image/jpeg,image/png">
+          </div>
+
+          <!-- ROTATE -->
+          <div id="img-rotate" style="display:none">
+            <div class="img-dropzone" id="dz-r" onclick="document.getElementById('fi-r').click()" style="margin-bottom:14px">
+              <span class="img-dropzone-icon">🔄</span>
+              <h3>选择要旋转的图片</h3>
+              <p>支持批量，每张独立调整</p>
+            </div>
+            <input type="file" id="fi-r" style="display:none" accept="image/jpeg,image/png" multiple>
+            <div class="img-controls">
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">输出格式</div>
+                <div class="fmt-pills" id="r-fmts">
+                  <button class="fmt-pill active" onclick="setFmt('r','jpeg',this)">JPG</button>
+                  <button class="fmt-pill" onclick="setFmt('r','png',this)">PNG</button>
+                  <button class="fmt-pill" onclick="setFmt('r','webp',this)">WebP</button>
+                </div>
+              </div>
+              <div class="ctrl-block">
+                <div class="ctrl-block-label">输出质量</div>
+                <div class="range-row">
+                  <input type="range" id="r-q" min="10" max="95" value="85" oninput="document.getElementById('r-qv').textContent=this.value">
+                  <span class="range-val" id="r-qv">85</span>
+                </div>
+              </div>
+            </div>
+            <div class="rotate-grid" id="r-grid"></div>
+            <button id="r-dlall" onclick="rDlAll()" style="display:none;margin-top:12px" class="fbtn blue">⬇ 全部下载</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /img -->
+
+    <!-- ====== JSON ====== -->
+    <div id="view-json" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#fef3c7">📋</div>
+          <div><div class="tool-card-title">JSON 格式化 / 校验</div><div class="tool-card-sub">语法高亮 · 压缩 · 结构校验</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <label class="flabel">输入 JSON</label>
+          <textarea class="ftextarea" id="j-in" style="min-height:160px" placeholder='{"name":"SamWaf","version":"1.3","open_source":true}'></textarea>
+          <div class="fbtns">
+            <button class="fbtn blue" onclick="jFmt()">格式化</button>
+            <button class="fbtn" onclick="jCompress()">压缩</button>
+            <button class="fbtn" onclick="jValidate()">校验</button>
+            <button class="fbtn red" onclick="jClear()">清空</button>
+          </div>
+          <div id="j-status" class="fresult" style="display:none"></div>
+          <div id="j-hl" class="json-hl"></div>
+          <div class="copy-row"><button class="copy-btn" onclick="copyEl('j-hl')">复制结果</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== BASE64 ====== -->
+    <div id="view-base64" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#f0fdf4">🔤</div>
+          <div><div class="tool-card-title">Base64 编解码</div><div class="tool-card-sub">支持 Unicode 中文 · 双向转换</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="frow">
+            <div class="fgroup">
+              <label class="flabel">输入</label>
+              <textarea class="ftextarea" id="b64-in" placeholder="输入文本或 Base64…"></textarea>
+              <div class="fbtns">
+                <button class="fbtn blue" onclick="b64Enc()">编码 →</button>
+                <button class="fbtn teal" onclick="b64Dec()">← 解码</button>
+                <button class="fbtn red" onclick="b64Clear()">清空</button>
+              </div>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">输出</label>
+              <textarea class="ftextarea" id="b64-out" readonly placeholder="结果…"></textarea>
+              <div class="copy-row"><button class="copy-btn" onclick="copyEl('b64-out')">复制</button></div>
+            </div>
+          </div>
+          <div id="b64-st" class="fresult" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== URL ====== -->
+    <div id="view-url" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#ecfdf5">🔗</div>
+          <div><div class="tool-card-title">URL 编解码</div><div class="tool-card-sub">encodeURIComponent · 中文支持</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="frow">
+            <div class="fgroup">
+              <label class="flabel">输入</label>
+              <textarea class="ftextarea" id="url-in" placeholder="输入 URL 或文本…&#10;https://example.com/搜索?q=中文"></textarea>
+              <div class="fbtns">
+                <button class="fbtn blue" onclick="urlEnc()">编码 →</button>
+                <button class="fbtn teal" onclick="urlDec()">← 解码</button>
+                <button class="fbtn red" onclick="urlClear()">清空</button>
+              </div>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">输出</label>
+              <textarea class="ftextarea" id="url-out" readonly placeholder="结果…"></textarea>
+              <div class="copy-row"><button class="copy-btn" onclick="copyEl('url-out')">复制</button></div>
+            </div>
+          </div>
+          <div id="url-st" class="fresult" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== TIMESTAMP ====== -->
+    <div id="view-ts" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#eff6ff">⏱</div>
+          <div><div class="tool-card-title">时间戳转换</div><div class="tool-card-sub">Unix Timestamp · 双向转换</div></div>
+        </div>
+        <div class="tool-card-body">
+          <div class="ts-clock">
+            <div class="ts-clock-val" id="ts-now">—</div>
+            <div class="ts-clock-label">当前 Unix 时间戳（秒）</div>
+          </div>
+          <div class="frow">
+            <div class="fgroup">
+              <label class="flabel">时间戳 → 日期</label>
+              <input class="finput" id="ts-in" placeholder="输入秒或毫秒时间戳">
+              <div class="fbtns">
+                <button class="fbtn blue" onclick="ts2date()">转换</button>
+                <button class="fbtn" onclick="document.getElementById('ts-in').value=Math.floor(Date.now()/1000)">填入当前</button>
+              </div>
+              <div class="fresult" id="ts-r" style="margin-top:10px">—</div>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">日期 → 时间戳</label>
+              <input class="finput" id="dt-in" type="datetime-local">
+              <div class="fbtns"><button class="fbtn blue" onclick="date2ts()">转换</button></div>
+              <div class="fresult" id="dt-r" style="margin-top:10px">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== HASH ====== -->
+    <div id="view-hash" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#fef3c7">🔑</div>
+          <div><div class="tool-card-title">Hash 计算</div><div class="tool-card-sub">MD5 · SHA-1 · SHA-256 · SHA-512</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="hash-alg-row">
+            <label class="hash-chk"><input type="checkbox" id="hc-md5" checked> MD5</label>
+            <label class="hash-chk"><input type="checkbox" id="hc-sha1"> SHA-1</label>
+            <label class="hash-chk"><input type="checkbox" id="hc-sha256" checked> SHA-256</label>
+            <label class="hash-chk"><input type="checkbox" id="hc-sha512"> SHA-512</label>
+          </div>
+          <label class="flabel">输入文本</label>
+          <textarea class="ftextarea" id="h-in" placeholder="输入需要计算 Hash 的文本…"></textarea>
+          <div class="fbtns">
+            <button class="fbtn blue" onclick="calcHash()">计算</button>
+            <button class="fbtn red" onclick="document.getElementById('h-in').value='';document.getElementById('h-res').innerHTML=''">清空</button>
+          </div>
+          <div class="hash-result-list" id="h-res"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PASSWORD ====== -->
+    <div id="view-pw" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#fef2f2">🔒</div>
+          <div><div class="tool-card-title">密码生成器</div><div class="tool-card-sub">加密随机 · 强度评估 · 批量生成</div></div>
+          <span class="tool-card-badge ftag green">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="frow">
+            <div>
+              <label class="flabel">长度: <span id="pw-lv">16</span></label>
+              <input type="range" id="pw-len" min="6" max="64" value="16" oninput="document.getElementById('pw-lv').textContent=this.value;pwGen()" style="margin:8px 0 16px;width:100%">
+              <div class="pw-opts">
+                <label class="pw-opt"><input type="checkbox" id="pw-u" checked> 大写 A-Z</label>
+                <label class="pw-opt"><input type="checkbox" id="pw-l" checked> 小写 a-z</label>
+                <label class="pw-opt"><input type="checkbox" id="pw-n" checked> 数字 0-9</label>
+                <label class="pw-opt"><input type="checkbox" id="pw-s"> 特殊 !@#$</label>
+              </div>
+              <div class="fbtns" style="margin-top:12px">
+                <button class="fbtn blue" onclick="pwGen()">🔄 重新生成</button>
+                <button class="fbtn" onclick="copyEl2('pw-disp')">复制</button>
+              </div>
+            </div>
+            <div>
+              <label class="flabel">生成结果</label>
+              <div class="pw-result-display" id="pw-disp">—</div>
+              <div class="pw-str-bar"><div class="pw-str-fill" id="pw-sf"></div></div>
+              <div class="pw-str-label" id="pw-sl">—</div>
+              <div class="fdiv"></div>
+              <label class="flabel">批量生成</label>
+              <div style="display:flex;gap:8px">
+                <input class="finput" type="number" id="pw-cnt" value="5" min="1" max="50" style="width:80px">
+                <button class="fbtn" onclick="pwBatch()">生成</button>
+              </div>
+              <textarea class="ftextarea" id="pw-batch" style="display:none;margin-top:8px;min-height:80px;font-size:11px" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Sam<span>Waf</span> Tools</div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://github.com/samwafgo/SamWaf" target="_blank">GitHub</a>
+      <a class="footer-link" href="https://gitee.com/samwaf/SamWaf" target="_blank">Gitee</a>
+      <a class="footer-link" href="https://doc.samwaf.com" target="_blank">文档</a>
+      <a class="footer-link" href="https://hub.docker.com/r/samwaf/samwaf" target="_blank">Docker</a>
+    </div>
+    <div class="footer-copy">© 2024 SamWaf · Apache 2.0 · 工具数据本地处理，零上传</div>
+  </div>
+</footer>
+
+<script>
+// ===== State =====
+const S = {
+  c: { fmt:'jpeg', blobs:[] },
+  m: { fmt:'jpeg', layout:'v', slots:[], activeIdx:null, prevUrl:null },
+  r: { fmt:'jpeg', items:[] }
+};
+
+// ===== Navigation =====
+function nav(id) {
+  document.querySelectorAll('.tool-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(id==='ts') startClock();
+  if(id==='pw') pwGen();
+}
+
+// ===== Image mode =====
+function imgMode(m, btn) {
+  document.querySelectorAll('.img-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['compress','merge','rotate'].forEach(n=>document.getElementById('img-'+n).style.display=n===m?'block':'none');
+  if(m==='merge'&&S.m.slots.length===0){addMSlot();addMSlot();}
+}
+
+// ===== Format helpers =====
+function setFmt(key, fmt, btn) {
+  S[key].fmt = fmt;
+  btn.closest('.fmt-pills').querySelectorAll('.fmt-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setMLayout(l, btn) {
+  S.m.layout = l;
+  document.getElementById('m-layout-btns').querySelectorAll('.fmt-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  mPreview();
+}
+function mimeExt(fmt) {
+  if(fmt==='png') return {mime:'image/png',ext:'png'};
+  if(fmt==='webp') return {mime:'image/webp',ext:'webp'};
+  return {mime:'image/jpeg',ext:'jpg'};
+}
+function fmtSize(b) {
+  if(b<1024) return b+'B';
+  if(b<1048576) return (b/1024).toFixed(1)+'KB';
+  return (b/1048576).toFixed(2)+'MB';
+}
+function fDataURL(f){return new Promise((r,j)=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.onerror=j;rd.readAsDataURL(f);})}
+function loadImg(src){return new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=src;})}
+function toBlob(c,m,q){return new Promise(r=>c.toBlob(r,m,q))}
+
+// ===== Drag n Drop: compress =====
+setupDrop('dz-c','fi-c',f=>f.forEach(compressImg));
+document.getElementById('fi-c').onchange=e=>{[...e.target.files].forEach(compressImg);e.target.value='';};
+
+async function compressImg(file) {
+  const list=document.getElementById('c-list');
+  const id='ci_'+Date.now()+Math.random().toString(36).slice(2);
+  const row=document.createElement('div'); row.className='img-row'; row.id=id;
+  row.innerHTML=`<div style="width:64px;height:48px;background:var(--gray-100);border-radius:7px"></div><div><div class="img-row-name">${file.name}</div><div class="size-tag">${fmtSize(file.size)} → <span style="color:var(--muted)">处理中…</span></div><div class="progress-track"><div class="progress-fill" id="pf_${id}"></div></div></div><span></span>`;
+  list.prepend(row);
+  setTimeout(()=>document.getElementById('pf_'+id).style.width='60%',40);
+  const durl=await fDataURL(file);
+  const img=await loadImg(durl);
+  const q=parseInt(document.getElementById('c-q').value)/100;
+  const {mime,ext}=mimeExt(S.c.fmt);
+  const cv=document.createElement('canvas'); cv.width=img.naturalWidth; cv.height=img.naturalHeight;
+  const ctx=cv.getContext('2d');
+  if(mime!=='image/png'){ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);}
+  ctx.drawImage(img,0,0);
+  document.getElementById('pf_'+id).style.width='90%';
+  const blob=await toBlob(cv,mime,mime==='image/png'?undefined:q);
+  document.getElementById('pf_'+id).style.width='100%';
+  const url=URL.createObjectURL(blob);
+  const saved=Math.round((1-blob.size/file.size)*100);
+  const dlName=file.name.replace(/\.[^.]+$/,'')+'_compressed.'+ext;
+  S.c.blobs.push({url,name:dlName});
+  document.getElementById(id).outerHTML=`<div class="img-row" id="${id}"><img class="img-row-thumb" src="${url}"><div><div class="img-row-name">${file.name}</div><div class="size-tag">${fmtSize(file.size)} → <span class="size-saved">${fmtSize(blob.size)}</span>${saved>0?`<span class="ftag green">-${saved}%</span>`:''}</div></div><a class="dl-btn" href="${url}" download="${dlName}">⬇ 下载</a></div>`;
+  document.getElementById('c-dlall').style.display='block';
+}
+function cDlAll(){S.c.blobs.forEach((b,i)=>setTimeout(()=>{const a=document.createElement('a');a.href=b.url;a.download=b.name;a.click();},i*260));}
+
+// ===== Merge =====
+function mergeScene(sc, btn) {
+  document.querySelectorAll('.scene-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  S.m.slots=[];
+  const scenes={id:['身份证正面','身份证背面'],bank:['银行卡正面','银行卡背面'],passport:['护照首页','护照信息页'],custom:[]};
+  (scenes[sc]||[]).forEach(l=>S.m.slots.push({durl:null,rot:0,label:l}));
+  if(S.m.slots.length===0){S.m.slots.push({durl:null,rot:0,label:'图片 1'});S.m.slots.push({durl:null,rot:0,label:'图片 2'});}
+  renderSlots();
+}
+function addMSlot(){S.m.slots.push({durl:null,rot:0,label:'图片 '+(S.m.slots.length+1)});renderSlots();}
+function renderSlots(){
+  const el=document.getElementById('m-slots'); el.innerHTML='';
+  S.m.slots.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='merge-slot'+(s.durl?' filled':'');
+    d.innerHTML=`<div class="slot-num${s.durl?' filled':''}">${i+1}</div>${s.durl?`<img class="slot-preview" src="${s.durl}" style="transform:rotate(${s.rot}deg);transition:.3s">`:'<div style="width:80px;height:52px;border-radius:7px;background:var(--gray-100)"></div>'}<div class="slot-meta"><div class="slot-label">${s.label}</div><div class="slot-sub">${s.durl?'已加载 · 点击更换':'点击选择图片'}</div>${s.durl?`<div class="slot-rot-bar"><button class="rot-btn" onclick="rotSlot(${i},-90);event.stopPropagation()">↺-90°</button><button class="rot-btn" onclick="rotSlot(${i},90);event.stopPropagation()">↻+90°</button><button class="rot-btn" onclick="rotSlot(${i},180);event.stopPropagation()">↕180°</button><span style="font-size:10px;color:var(--blue);margin-left:4px">${s.rot}°</span></div>`:''}</div><div style="display:flex;gap:6px">${s.durl?`<button class="slot-del" onclick="clearSlot(${i});event.stopPropagation()">✕</button>`:''}${S.m.slots.length>2?`<button class="slot-del" onclick="delSlot(${i});event.stopPropagation()">🗑</button>`:''}</div>`;
+    d.addEventListener('click',()=>pickSlot(i));
+    el.appendChild(d);
+  });
+}
+function pickSlot(i){S.m.activeIdx=i;document.getElementById('fi-m').value='';document.getElementById('fi-m').click();}
+document.getElementById('fi-m').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  S.m.slots[S.m.activeIdx].durl=await fDataURL(f); S.m.slots[S.m.activeIdx].rot=0;
+  renderSlots(); mPreview();
+};
+function rotSlot(i,d){S.m.slots[i].rot=((S.m.slots[i].rot+d)%360+360)%360;renderSlots();mPreview();}
+function clearSlot(i){S.m.slots[i].durl=null;S.m.slots[i].rot=0;renderSlots();mPreview();}
+function delSlot(i){if(S.m.slots.length<=2)return;S.m.slots.splice(i,1);renderSlots();mPreview();}
+async function buildMerge(){
+  const filled=S.m.slots.filter(s=>s.durl); if(!filled.length) return null;
+  const gap=parseInt(document.getElementById('m-gap').value);
+  const imgs=await Promise.all(filled.map(async s=>{
+    const img=await loadImg(s.durl); const rot=s.rot;
+    if(!rot) return {el:img,w:img.naturalWidth,h:img.naturalHeight};
+    const oc=document.createElement('canvas');
+    const rad=rot*Math.PI/180;
+    if(rot===90||rot===270){oc.width=img.naturalHeight;oc.height=img.naturalWidth;}
+    else{oc.width=img.naturalWidth;oc.height=img.naturalHeight;}
+    const c=oc.getContext('2d'); c.translate(oc.width/2,oc.height/2); c.rotate(rad); c.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+    const ri=await loadImg(oc.toDataURL()); return {el:ri,w:oc.width,h:oc.height};
+  }));
+  const cv=document.createElement('canvas'); const ctx=cv.getContext('2d'); ctx.fillStyle='#fff';
+  if(S.m.layout==='v'){
+    const maxW=Math.max(...imgs.map(i=>i.w));
+    const sc=imgs.map(i=>({el:i.el,sw:maxW,sh:Math.round(i.h*maxW/i.w)}));
+    cv.width=maxW; cv.height=sc.reduce((s,i)=>s+i.sh,0)+gap*(sc.length-1);
+    ctx.fillRect(0,0,cv.width,cv.height); let y=0;
+    sc.forEach(i=>{ctx.drawImage(i.el,0,y,i.sw,i.sh);y+=i.sh+gap;});
+  } else if(S.m.layout==='h'){
+    const maxH=Math.max(...imgs.map(i=>i.h));
+    const sc=imgs.map(i=>({el:i.el,sw:Math.round(i.w*maxH/i.h),sh:maxH}));
+    cv.height=maxH; cv.width=sc.reduce((s,i)=>s+i.sw,0)+gap*(sc.length-1);
+    ctx.fillRect(0,0,cv.width,cv.height); let x=0;
+    sc.forEach(i=>{ctx.drawImage(i.el,x,0,i.sw,i.sh);x+=i.sw+gap;});
+  } else {
+    const cols=2,rows=Math.ceil(imgs.length/cols);
+    const cw=Math.max(...imgs.map(i=>i.w)),ch=Math.max(...imgs.map(i=>i.h));
+    cv.width=cols*cw+(cols-1)*gap; cv.height=rows*ch+(rows-1)*gap;
+    ctx.fillRect(0,0,cv.width,cv.height);
+    imgs.forEach((img,idx)=>{const col=idx%cols,row=Math.floor(idx/cols);ctx.drawImage(img.el,col*(cw+gap)+Math.round((cw-img.w)/2),row*(ch+gap)+Math.round((ch-img.h)/2),img.w,img.h);});
+  }
+  return cv;
+}
+async function mPreview(){
+  const cv=await buildMerge(); if(!cv) return;
+  const box=document.getElementById('m-prev-box'); box.style.display='block';
+  const blob=await toBlob(cv,'image/jpeg',.6);
+  if(S.m.prevUrl) URL.revokeObjectURL(S.m.prevUrl);
+  S.m.prevUrl=URL.createObjectURL(blob);
+  document.getElementById('m-prev-img').src=S.m.prevUrl;
+}
+async function mDownload(){
+  const cv=await buildMerge(); if(!cv){alert('请至少添加一张图片');return;}
+  const q=.9; const {mime,ext}=mimeExt(S.m.fmt);
+  const blob=await toBlob(cv,mime,mime==='image/png'?undefined:q);
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='merged.'+ext; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+
+// ===== Rotate =====
+setupDrop('dz-r','fi-r',f=>f.forEach(addRotItem));
+document.getElementById('fi-r').onchange=e=>{[...e.target.files].forEach(addRotItem);e.target.value='';};
+async function addRotItem(file){
+  const grid=document.getElementById('r-grid');
+  const empty=grid.querySelector('.empty-state'); if(empty) empty.remove();
+  const durl=await fDataURL(file); const id=S.r.items.length;
+  S.r.items.push({file,durl,rot:0}); renderRotCard(id);
+  document.getElementById('r-dlall').style.display='block';
+}
+function renderRotCard(id){
+  const grid=document.getElementById('r-grid'); const s=S.r.items[id];
+  let card=document.getElementById('rc_'+id);
+  if(!card){card=document.createElement('div');card.className='rot-card';card.id='rc_'+id;grid.appendChild(card);}
+  card.innerHTML=`<div class="rot-card-img-wrap"><img class="rot-card-img" src="${s.durl}" style="transform:rotate(${s.rot}deg)"></div><div class="rot-card-body"><div class="rot-card-name">${s.file.name}</div><div style="font-size:10px;color:var(--blue);margin-bottom:5px;font-family:var(--mono)">${s.rot}°</div><div class="rot-card-btns"><button class="rc-btn" onclick="rotItem(${id},-90)">↺</button><button class="rc-btn" onclick="rotItem(${id},90)">↻</button><button class="rc-btn" onclick="rotItem(${id},180)">↕</button><button class="rc-btn dl" onclick="dlRotated(${id})">⬇</button></div></div>`;
+}
+function rotItem(id,d){S.r.items[id].rot=((S.r.items[id].rot+d)%360+360)%360;renderRotCard(id);}
+async function dlRotated(id){
+  const s=S.r.items[id]; const img=await loadImg(s.durl); const rot=s.rot;
+  const cv=document.createElement('canvas');
+  if(rot===90||rot===270){cv.width=img.naturalHeight;cv.height=img.naturalWidth;}
+  else{cv.width=img.naturalWidth;cv.height=img.naturalHeight;}
+  const ctx=cv.getContext('2d'); ctx.translate(cv.width/2,cv.height/2); ctx.rotate(rot*Math.PI/180); ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+  const q=parseInt(document.getElementById('r-q').value)/100; const {mime,ext}=mimeExt(S.r.fmt);
+  const blob=await toBlob(cv,mime,mime==='image/png'?undefined:q);
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=s.file.name.replace(/\.[^.]+$/,'')+'_rotated.'+ext; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+async function rDlAll(){for(let i=0;i<S.r.items.length;i++){await new Promise(r=>setTimeout(r,i*250));dlRotated(i);}}
+
+// ===== Drag setup =====
+function setupDrop(dzId,fiId,handler){
+  const dz=document.getElementById(dzId);
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');handler([...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')));});
+}
+
+// ===== JSON =====
+function jFmt(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());const hl=document.getElementById('j-hl');hl.innerHTML=synHl(JSON.stringify(o,null,2));hl.classList.add('show');jSt('✓ JSON 格式有效',true);}catch(e){jSt('✕ 解析失败: '+e.message,false);document.getElementById('j-hl').classList.remove('show');}}
+function jCompress(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());document.getElementById('j-in').value=JSON.stringify(o);document.getElementById('j-hl').classList.remove('show');jSt('✓ 已压缩',true);}catch(e){jSt('✕ '+e.message,false);}}
+function jValidate(){try{JSON.parse(document.getElementById('j-in').value.trim());jSt('✓ JSON 结构有效',true);}catch(e){jSt('✕ 无效: '+e.message,false);}}
+function jClear(){document.getElementById('j-in').value='';document.getElementById('j-hl').classList.remove('show');document.getElementById('j-status').style.display='none';}
+function jSt(m,ok){const el=document.getElementById('j-status');el.style.display='block';el.textContent=m;el.className='fresult '+(ok?'ok':'err');}
+function synHl(j){return j.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{let c='jn';if(/^"/.test(m)){c=/:$/.test(m)?'jk':'js';}else if(/true|false/.test(m))c='jb';else if(/null/.test(m))c='jnu';return`<span class="${c}">${m.replace(/</g,'&lt;')}</span>`;});}
+
+// ===== Base64 =====
+function b64Enc(){try{document.getElementById('b64-out').value=btoa(unescape(encodeURIComponent(document.getElementById('b64-in').value)));document.getElementById('b64-st').style.display='none';}catch(e){showSt('b64-st','✕ 编码失败: '+e.message,false);}}
+function b64Dec(){try{document.getElementById('b64-out').value=decodeURIComponent(escape(atob(document.getElementById('b64-in').value.trim())));document.getElementById('b64-st').style.display='none';}catch(e){showSt('b64-st','✕ 解码失败，请确认为有效 Base64',false);}}
+function b64Clear(){document.getElementById('b64-in').value='';document.getElementById('b64-out').value='';document.getElementById('b64-st').style.display='none';}
+
+// ===== URL =====
+function urlEnc(){try{document.getElementById('url-out').value=encodeURIComponent(document.getElementById('url-in').value);document.getElementById('url-st').style.display='none';}catch(e){showSt('url-st','✕ '+e.message,false);}}
+function urlDec(){try{document.getElementById('url-out').value=decodeURIComponent(document.getElementById('url-in').value);document.getElementById('url-st').style.display='none';}catch(e){showSt('url-st','✕ 解码失败',false);}}
+function urlClear(){document.getElementById('url-in').value='';document.getElementById('url-out').value='';document.getElementById('url-st').style.display='none';}
+
+// ===== Timestamp =====
+let _clk;
+function startClock(){clearInterval(_clk);const u=()=>document.getElementById('ts-now').textContent=Math.floor(Date.now()/1000);u();_clk=setInterval(u,1000);}
+function ts2date(){let v=parseInt(document.getElementById('ts-in').value);if(!v)return;if(v.toString().length>10)v=Math.floor(v/1000);const d=new Date(v*1000);document.getElementById('ts-r').textContent=`本地: ${d.toLocaleString('zh-CN')}\nUTC:  ${d.toUTCString()}\nISO:  ${d.toISOString()}`;}
+function date2ts(){const v=document.getElementById('dt-in').value;if(!v)return;const ms=new Date(v).getTime();document.getElementById('dt-r').textContent=`秒 (Unix): ${Math.floor(ms/1000)}\n毫秒:      ${ms}`;}
+
+// ===== Hash =====
+async function calcHash(){
+  const txt=document.getElementById('h-in').value; if(!txt) return;
+  const enc=new TextEncoder(); const data=enc.encode(txt);
+  const res=document.getElementById('h-res'); res.innerHTML='';
+  const algos=[{id:'hc-md5',name:'MD5',fn:async()=>simpleMD5(txt)},{id:'hc-sha1',name:'SHA-1',algo:'SHA-1'},{id:'hc-sha256',name:'SHA-256',algo:'SHA-256'},{id:'hc-sha512',name:'SHA-512',algo:'SHA-512'}];
+  for(const a of algos){
+    if(!document.getElementById(a.id).checked) continue;
+    let hash;
+    if(a.fn) hash=await a.fn();
+    else{const buf=await crypto.subtle.digest(a.algo,data);hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+    const row=document.createElement('div');row.className='hash-row';
+    row.innerHTML=`<div class="hash-algo">${a.name}</div><div class="hash-val">${hash}</div>`;
+    res.appendChild(row);
+  }
+}
+
+// Minimal MD5
+function simpleMD5(str){
+  function sa(x,y){var l=(x&0xFFFF)+(y&0xFFFF);return(((x>>16)+(y>>16)+(l>>16))<<16)|(l&0xFFFF);}
+  function rl(n,c){return(n<<c)|(n>>>(32-c));}
+  function cm(q,a,b,x,s,t){return sa(rl(sa(sa(a,q),sa(x,t)),s),b);}
+  function F(a,b,c,d,x,s,t){return cm((b&c)|(~b&d),a,b,x,s,t);}
+  function G(a,b,c,d,x,s,t){return cm((b&d)|(c&~d),a,b,x,s,t);}
+  function H(a,b,c,d,x,s,t){return cm(b^c^d,a,b,x,s,t);}
+  function I(a,b,c,d,x,s,t){return cm(c^(b|~d),a,b,x,s,t);}
+  str=unescape(encodeURIComponent(str));
+  var M=[],l=str.length;
+  for(var i=0;i<l-3;i+=4)M.push(str.charCodeAt(i)+(str.charCodeAt(i+1)<<8)+(str.charCodeAt(i+2)<<16)+(str.charCodeAt(i+3)<<24));
+  switch(l%4){case 0:M.push(0x080);break;case 1:M.push(str.charCodeAt(l-1)+0x0800);break;case 2:M.push(str.charCodeAt(l-2)+(str.charCodeAt(l-1)<<8)+0x080000);break;case 3:M.push(str.charCodeAt(l-3)+(str.charCodeAt(l-2)<<8)+(str.charCodeAt(l-1)<<16)+0x08000000);break;}
+  while(M.length%16!==14)M.push(0);M.push(l*8);M.push(0);
+  var a0=1732584193,b0=-271733879,c0=-1732584194,d0=271733878;
+  for(var i=0;i<M.length;i+=16){
+    var a=a0,b=b0,c=c0,d=d0;
+    a=F(a,b,c,d,M[i],7,-680876936);d=F(d,a,b,c,M[i+1],12,-389564586);c=F(c,d,a,b,M[i+2],17,606105819);b=F(b,c,d,a,M[i+3],22,-1044525330);
+    a=F(a,b,c,d,M[i+4],7,-176418897);d=F(d,a,b,c,M[i+5],12,1200080426);c=F(c,d,a,b,M[i+6],17,-1473231341);b=F(b,c,d,a,M[i+7],22,-45705983);
+    a=F(a,b,c,d,M[i+8],7,1770035416);d=F(d,a,b,c,M[i+9],12,-1958414417);c=F(c,d,a,b,M[i+10],17,-42063);b=F(b,c,d,a,M[i+11],22,-1990404162);
+    a=F(a,b,c,d,M[i+12],7,1804603682);d=F(d,a,b,c,M[i+13],12,-40341101);c=F(c,d,a,b,M[i+14],17,-1502002290);b=F(b,c,d,a,M[i+15],22,1236535329);
+    a=G(a,b,c,d,M[i+1],5,-165796510);d=G(d,a,b,c,M[i+6],9,-1069501632);c=G(c,d,a,b,M[i+11],14,643717713);b=G(b,c,d,a,M[i],20,-373897302);
+    a=G(a,b,c,d,M[i+5],5,-701558691);d=G(d,a,b,c,M[i+10],9,38016083);c=G(c,d,a,b,M[i+15],14,-660478335);b=G(b,c,d,a,M[i+4],20,-405537848);
+    a=G(a,b,c,d,M[i+9],5,568446438);d=G(d,a,b,c,M[i+14],9,-1019803690);c=G(c,d,a,b,M[i+3],14,-187363961);b=G(b,c,d,a,M[i+8],20,1163531501);
+    a=G(a,b,c,d,M[i+13],5,-1444681467);d=G(d,a,b,c,M[i+2],9,-51403784);c=G(c,d,a,b,M[i+7],14,1735328473);b=G(b,c,d,a,M[i+12],20,-1926607734);
+    a=H(a,b,c,d,M[i+5],4,-378558);d=H(d,a,b,c,M[i+8],11,-2022574463);c=H(c,d,a,b,M[i+11],16,1839030562);b=H(b,c,d,a,M[i+14],23,-35309556);
+    a=H(a,b,c,d,M[i+1],4,-1530992060);d=H(d,a,b,c,M[i+4],11,1272893353);c=H(c,d,a,b,M[i+7],16,-155497632);b=H(b,c,d,a,M[i+10],23,-1094730640);
+    a=H(a,b,c,d,M[i+13],4,681279174);d=H(d,a,b,c,M[i],11,-358537222);c=H(c,d,a,b,M[i+3],16,-722521979);b=H(b,c,d,a,M[i+6],23,76029189);
+    a=H(a,b,c,d,M[i+9],4,-640364487);d=H(d,a,b,c,M[i+12],11,-421815835);c=H(c,d,a,b,M[i+15],16,530742520);b=H(b,c,d,a,M[i+2],23,-995338651);
+    a=I(a,b,c,d,M[i],6,-198630844);d=I(d,a,b,c,M[i+7],10,1126891415);c=I(c,d,a,b,M[i+14],15,-1416354905);b=I(b,c,d,a,M[i+5],21,-57434055);
+    a=I(a,b,c,d,M[i+12],6,1700485571);d=I(d,a,b,c,M[i+3],10,-1894986606);c=I(c,d,a,b,M[i+10],15,-1051523);b=I(b,c,d,a,M[i+1],21,-2054922799);
+    a=I(a,b,c,d,M[i+8],6,1873313359);d=I(d,a,b,c,M[i+15],10,-30611744);c=I(c,d,a,b,M[i+6],15,-1560198380);b=I(b,c,d,a,M[i+13],21,1309151649);
+    a=I(a,b,c,d,M[i+4],6,-145523070);d=I(d,a,b,c,M[i+11],10,-1120210379);c=I(c,d,a,b,M[i+2],15,718787259);b=I(b,c,d,a,M[i+9],21,-343485551);
+    a0=sa(a0,a);b0=sa(b0,b);c0=sa(c0,c);d0=sa(d0,d);
+  }
+  var r='';
+  [a0,b0,c0,d0].forEach(n=>{for(var j=0;j<4;j++)r+=('0'+((n>>(j*8))&0xFF).toString(16)).slice(-2);});
+  return r;
+}
+
+// ===== Password =====
+function pwGen(){
+  const len=parseInt(document.getElementById('pw-len').value);
+  let ch='';
+  if(document.getElementById('pw-u').checked)ch+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(document.getElementById('pw-l').checked)ch+='abcdefghijklmnopqrstuvwxyz';
+  if(document.getElementById('pw-n').checked)ch+='0123456789';
+  if(document.getElementById('pw-s').checked)ch+='!@#$%^&*()-_=+[]{}|';
+  if(!ch)ch='abcdefghijklmnopqrstuvwxyz';
+  const arr=new Uint32Array(len); crypto.getRandomValues(arr);
+  const pw=Array.from(arr).map(n=>ch[n%ch.length]).join('');
+  document.getElementById('pw-disp').textContent=pw;
+  pwStrength(pw);
+}
+function pwStrength(pw){
+  let s=0;
+  if(pw.length>=12)s++;if(pw.length>=20)s++;if(/[A-Z]/.test(pw))s++;if(/[a-z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  const colors=['#ef4444','#f97316','#eab308','#22c55e','#10b981'];
+  const labels=['极弱','弱','中等','强','极强'];
+  const idx=Math.min(Math.floor(s/1.5),4);
+  document.getElementById('pw-sf').style.cssText=`width:${s/6*100}%;background:${colors[idx]}`;
+  document.getElementById('pw-sl').textContent='强度: '+labels[idx];
+}
+function pwBatch(){
+  const count=Math.min(parseInt(document.getElementById('pw-cnt').value)||5,50);
+  const len=parseInt(document.getElementById('pw-len').value);
+  let ch='';
+  if(document.getElementById('pw-u').checked)ch+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(document.getElementById('pw-l').checked)ch+='abcdefghijklmnopqrstuvwxyz';
+  if(document.getElementById('pw-n').checked)ch+='0123456789';
+  if(document.getElementById('pw-s').checked)ch+='!@#$%^&*()-_=+';
+  if(!ch)ch='abcdefghijklmnopqrstuvwxyz';
+  const pws=[];
+  for(let i=0;i<count;i++){const arr=new Uint32Array(len);crypto.getRandomValues(arr);pws.push(Array.from(arr).map(n=>ch[n%ch.length]).join(''));}
+  const el=document.getElementById('pw-batch');el.style.display='block';el.value=pws.join('\n');
+}
+
+// ===== Shared copy =====
+function copyEl(id){const el=document.getElementById(id);const t=el.value!==undefined?el.value:el.innerText;navigator.clipboard.writeText(t);}
+function copyEl2(id){const t=document.getElementById(id).textContent;navigator.clipboard.writeText(t);}
+function showSt(id,msg,ok){const el=document.getElementById(id);el.style.display='block';el.textContent=msg;el.className='fresult '+(ok?'ok':'err');}
+
+// ===== Init =====
+pwGen();
+// Init merge slots
+S.m.slots=[{durl:null,rot:0,label:'图片 1'},{durl:null,rot:0,label:'图片 2'}];
+renderSlots();
+</script>
+</body>
+</html>
