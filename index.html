@@ -480,6 +480,70 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .ts-clock-val { font-family: var(--mono); font-size: 42px; font-weight: 700; color: var(--blue); letter-spacing: 2px; }
 .ts-clock-label { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 
+/* ===== JSON TABLE HINT ===== */
+.j-table-hint {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+  margin-top: 10px; padding: 9px 13px; border-radius: 8px;
+  background: var(--amber-l); border: 1px solid #fde68a;
+  font-size: 12px; color: var(--gray-700); line-height: 1.6;
+}
+.j-table-hint-icon { font-style: normal; flex-shrink: 0; }
+.j-table-hint-code {
+  font-family: var(--mono); font-size: 11.5px; color: #92400e;
+  background: rgba(255,255,255,.6); border: 1px solid #fcd34d;
+  border-radius: 4px; padding: 1px 7px; word-break: break-all;
+}
+.j-table-hint-sep { color: var(--muted); font-size: 11px; }
+
+/* ===== JSON TABLE ===== */
+.json-table-wrap {
+  display: none; margin-top: 12px;
+  border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.json-table-wrap.show { display: block; }
+.jt2-toolbar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--white); border-bottom: 1px solid var(--border);
+}
+.jt2-toolbar-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-right: auto; }
+.jt2-info { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.jt2-tbtn {
+  font-size: 11px; padding: 3px 10px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--white);
+  cursor: pointer; color: var(--gray-700); font-family: var(--font);
+  font-weight: 600; transition: all .15s;
+}
+.jt2-tbtn:hover { border-color: var(--green); color: var(--green); background: var(--green-l); }
+.jt2-scroll { overflow-x: auto; max-height: 440px; overflow-y: auto; }
+.jt2-table {
+  width: 100%; border-collapse: collapse; font-family: var(--mono);
+  font-size: 12.5px; white-space: nowrap;
+}
+.jt2-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--gray-100); color: var(--gray-700);
+  font-weight: 700; font-size: 11px; letter-spacing: .04em;
+  padding: 8px 14px; border-bottom: 1.5px solid var(--border);
+  text-align: left; white-space: nowrap;
+}
+.jt2-table thead th:first-child {
+  background: var(--gray-100); color: var(--gray-400);
+  font-weight: 500; width: 48px; text-align: right;
+}
+.jt2-table tbody tr { transition: background .1s; }
+.jt2-table tbody tr:nth-child(even) { background: var(--gray-50); }
+.jt2-table tbody tr:hover { background: var(--blue-l); }
+.jt2-table td {
+  padding: 7px 14px; border-bottom: 1px solid var(--border);
+  color: var(--gray-900); max-width: 320px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.jt2-table td:first-child { color: var(--gray-400); text-align: right; font-size: 11px; }
+.jt2-td-null { color: var(--muted) !important; font-style: italic; }
+.jt2-td-bool-t { color: var(--green) !important; font-weight: 600; }
+.jt2-td-bool-f { color: var(--red) !important; font-weight: 600; }
+.jt2-td-num { color: #953800 !important; }
+
 /* ===== QR CODE ===== */
 .qr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media(max-width:680px){ .qr-layout { grid-template-columns: 1fr; } }
@@ -582,7 +646,7 @@ footer {
       </a>
     </div>
     <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num"><span id="hc-tools">9</span></div><div class="hstat-label">内置工具</div></div>
+      <div class="hstat"><div class="hstat-num"><span id="hc-tools">8</span></div><div class="hstat-label">内置工具</div></div>
       <div class="hstat-div"></div>
       <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-label">本地运行</div></div>
       <div class="hstat-div"></div>
@@ -749,7 +813,7 @@ footer {
       <div class="tool-card">
         <div class="tool-card-header">
           <div class="tool-card-icon" style="background:#fef3c7">📋</div>
-          <div><div class="tool-card-title">JSON 格式化 / 校验</div><div class="tool-card-sub">语法高亮 · 树形视图 · 压缩 · 校验</div></div>
+          <div><div class="tool-card-title">JSON 格式化 / 校验</div><div class="tool-card-sub">语法高亮 · 树形视图 · 表格 · 压缩 · 校验</div></div>
           <span class="tool-card-badge ftag green">本地运行</span>
         </div>
         <div class="tool-card-body">
@@ -758,6 +822,7 @@ footer {
           <div class="fbtns">
             <button class="fbtn blue" onclick="jFmt()">格式化</button>
             <button class="fbtn teal" onclick="jTree()">🌲 树形视图</button>
+            <button class="fbtn" style="color:var(--amber);border-color:var(--amber-l);background:var(--amber-l)" onclick="jTable()" title="支持格式：&#10;① 对象包数组：{&quot;data&quot;:[{...},{...}]}&#10;② 直接数组：[{...},{...}]">📊 转表格</button>
             <button class="fbtn" onclick="jCompress()">压缩</button>
             <button class="fbtn" onclick="jValidate()">校验</button>
             <button class="fbtn red" onclick="jClear()">清空</button>
@@ -771,6 +836,21 @@ footer {
               <button class="jt-tbtn" onclick="jtColAll()">全部折叠</button>
             </div>
             <div class="jt-body" id="j-tree-body"></div>
+          </div>
+          <div class="j-table-hint">
+            <span class="j-table-hint-icon">💡</span>
+            <span><strong>转表格</strong>支持以下两种格式（数组元素须为对象）：</span>
+            <code class="j-table-hint-code">{"data":[{"id":1,"name":"Sam"},{"id":2,"name":"Waf"}]}</code>
+            <span class="j-table-hint-sep">或</span>
+            <code class="j-table-hint-code">[{"id":1,"name":"Sam"},{"id":2,"name":"Waf"}]</code>
+          </div>
+          <div id="j-table" class="json-table-wrap">
+            <div class="jt2-toolbar">
+              <span class="jt2-toolbar-label">📊 表格视图</span>
+              <span class="jt2-info" id="j-table-info"></span>
+              <button class="jt2-tbtn" onclick="jTableCsv()">⬇ 下载 CSV</button>
+            </div>
+            <div class="jt2-scroll"><table class="jt2-table" id="j-table-el"></table></div>
           </div>
           <div class="copy-row"><button class="copy-btn" onclick="copyEl('j-hl')">复制结果</button></div>
         </div>
@@ -1243,12 +1323,13 @@ function jFmt(){
     hl.innerHTML=synHl(JSON.stringify(o,null,2));
     hl.classList.add('show');
     document.getElementById('j-tree').classList.remove('show');
+    document.getElementById('j-table').classList.remove('show');
     jSt('✓ JSON 格式有效',true);
   }catch(e){jSt('✕ 解析失败: '+e.message,false);document.getElementById('j-hl').classList.remove('show');}
 }
 function jCompress(){try{const o=JSON.parse(document.getElementById('j-in').value.trim());document.getElementById('j-in').value=JSON.stringify(o);document.getElementById('j-hl').classList.remove('show');document.getElementById('j-tree').classList.remove('show');jSt('✓ 已压缩',true);}catch(e){jSt('✕ '+e.message,false);}}
 function jValidate(){try{JSON.parse(document.getElementById('j-in').value.trim());jSt('✓ JSON 结构有效',true);}catch(e){jSt('✕ 无效: '+e.message,false);}}
-function jClear(){document.getElementById('j-in').value='';document.getElementById('j-hl').classList.remove('show');document.getElementById('j-tree').classList.remove('show');document.getElementById('j-status').style.display='none';}
+function jClear(){document.getElementById('j-in').value='';document.getElementById('j-hl').classList.remove('show');document.getElementById('j-tree').classList.remove('show');document.getElementById('j-table').classList.remove('show');document.getElementById('j-status').style.display='none';}
 function jSt(m,ok){const el=document.getElementById('j-status');el.style.display='block';el.textContent=m;el.className='fresult '+(ok?'ok':'err');}
 function synHl(j){return j.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{let c='jn';if(/^"/.test(m)){c=/:$/.test(m)?'jk':'js';}else if(/true|false/.test(m))c='jb';else if(/null/.test(m))c='jnu';return`<span class="${c}">${m.replace(/</g,'&lt;')}</span>`;});}
 
@@ -1343,6 +1424,110 @@ function jtExpAll(){
 function jtColAll(){
   document.querySelectorAll('#j-tree-body .jt-children').forEach(el=>el.classList.add('collapsed'));
   document.querySelectorAll('#j-tree-body .jt-arrow:not(.empty)').forEach(el=>el.textContent='▶');
+}
+
+// ===== JSON Table View =====
+let _jtRows = [], _jtHeaders = [];
+
+function jExtractArray(o) {
+  // 直接是数组
+  if (Array.isArray(o)) return o;
+  // 对象中找第一个值是数组且元素为对象的字段
+  if (o && typeof o === 'object') {
+    for (const k of Object.keys(o)) {
+      if (Array.isArray(o[k]) && o[k].length > 0) return o[k];
+    }
+  }
+  return null;
+}
+
+function jTable() {
+  const raw = document.getElementById('j-in').value.trim();
+  if (!raw) { jSt('✕ 内容为空', false); return; }
+  let o;
+  try { o = JSON.parse(raw); } catch(e) { jSt('✕ 解析失败: ' + e.message, false); return; }
+
+  const arr = jExtractArray(o);
+  if (!arr || arr.length === 0) {
+    jSt('✕ 未检测到数组数据，需要形如 {"data":[{...}]} 或直接是 [{...}] 的结构', false);
+    return;
+  }
+  if (typeof arr[0] !== 'object' || Array.isArray(arr[0])) {
+    jSt('✕ 数组元素需为对象（每行是 {...} 的形式）', false);
+    return;
+  }
+
+  // 收集所有 key（取所有行的并集，保持顺序）
+  const keySet = new Set();
+  arr.forEach(row => { if(row && typeof row==='object') Object.keys(row).forEach(k => keySet.add(k)); });
+  _jtHeaders = [...keySet];
+  _jtRows = arr;
+
+  const table = document.getElementById('j-table-el');
+  table.innerHTML = '';
+
+  // thead
+  const thead = table.createTHead();
+  const hr = thead.insertRow();
+  const th0 = document.createElement('th'); th0.textContent = '#'; hr.appendChild(th0);
+  _jtHeaders.forEach(h => {
+    const th = document.createElement('th');
+    th.textContent = h;
+    hr.appendChild(th);
+  });
+
+  // tbody
+  const tbody = table.createTBody();
+  arr.forEach((row, i) => {
+    const tr = tbody.insertRow();
+    const td0 = tr.insertCell(); td0.textContent = i + 1;
+    _jtHeaders.forEach(h => {
+      const td = tr.insertCell();
+      const v = (row && typeof row === 'object') ? row[h] : undefined;
+      if (v === null || v === undefined) {
+        td.textContent = v === null ? 'null' : '';
+        td.className = 'jt2-td-null';
+      } else if (typeof v === 'boolean') {
+        td.textContent = String(v);
+        td.className = v ? 'jt2-td-bool-t' : 'jt2-td-bool-f';
+      } else if (typeof v === 'number') {
+        td.textContent = v;
+        td.className = 'jt2-td-num';
+      } else if (typeof v === 'object') {
+        td.textContent = JSON.stringify(v);
+      } else {
+        td.textContent = v;
+      }
+    });
+  });
+
+  document.getElementById('j-table-info').textContent = `${arr.length} 行 × ${_jtHeaders.length} 列`;
+  document.getElementById('j-table').classList.add('show');
+  document.getElementById('j-hl').classList.remove('show');
+  document.getElementById('j-tree').classList.remove('show');
+  jSt('✓ 已转为表格，共 ' + arr.length + ' 行', true);
+}
+
+function jTableCsv() {
+  if (!_jtRows.length) { jSt('✕ 请先点击「转表格」', false); return; }
+  function csvCell(v) {
+    if (v === null || v === undefined) return '';
+    const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+    // 含逗号、双引号、换行时用双引号包裹，内部双引号转义
+    if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  const lines = [];
+  lines.push(_jtHeaders.map(csvCell).join(','));
+  _jtRows.forEach(row => {
+    lines.push(_jtHeaders.map(h => csvCell((row && typeof row==='object') ? row[h] : '')).join(','));
+  });
+  // BOM + UTF-8 使 Excel 直接识别中文
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'data.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 // ===== Base64 =====
