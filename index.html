@@ -3,7 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SamWaf Tools — 开发者工具集</title>
+<title>SamWaf Tools — 纯本地开发者工具集 | 数据不上传 JSON格式化 Base64 Hash 二维码 SQL</title>
+<meta name="description" content="SamWaf Tools：9款免费开发者工具，JSON格式化、Base64编解码、Hash计算（MD5/SHA）、密码生成、二维码生成、SQL参数填充等。所有运算纯浏览器本地执行，代码/密码/SQL等敏感数据绝不离开你的设备，零服务器上传，安全可靠。">
+<meta name="keywords" content="本地运行开发工具,纯前端工具,数据不上传,隐私安全工具,JSON格式化,Base64编解码,Hash计算,MD5,SHA256,密码生成器,二维码生成,URL编码,时间戳转换,SQL参数填充,离线开发工具,SamWaf">
+<meta name="author" content="SamWaf">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SamWaf Tools — 纯本地运行，数据绝不上传的开发者工具集">
+<meta property="og:description" content="9款免费开发者工具：JSON格式化、Base64、Hash、密码生成、二维码、SQL参数填充。纯浏览器本地计算，代码与敏感数据零上传，安全可靠。">
+<meta property="og:url" content="https://samwaf.com/">
+<meta property="og:site_name" content="SamWaf Tools">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SamWaf Tools — 纯本地运行，数据绝不上传">
+<meta name="twitter:description" content="9款免费开发者工具，JSON/Base64/Hash/密码/二维码/SQL，纯浏览器本地计算，敏感数据零上传，安全可靠。">
+<link rel="canonical" href="https://samwaf.com/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SamWaf Tools",
+  "url": "https://samwaf.com/",
+  "description": "9款免费在线开发者工具，包含JSON格式化、Base64编解码、Hash计算、密码生成器、二维码生成、SQL参数填充等。所有运算纯浏览器本地执行，代码、密码、SQL等敏感数据绝不上传至任何服务器，安全可靠，保护隐私。",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+  "author": { "@type": "Organization", "name": "SamWaf", "url": "https://samwaf.com/" },
+  "featureList": [
+    "图片压缩/合并/旋转 — 纯本地处理，图片不上传",
+    "JSON格式化与校验 — 代码不离开浏览器",
+    "Base64编解码 — 本地转换，零上传",
+    "URL编解码 — 本地运行",
+    "Unix时间戳转换 — 本地计算",
+    "Hash计算（MD5/SHA-1/SHA-256/SHA-512）— 密码/文本本地哈希",
+    "安全密码生成器 — 加密随机，密码不传输",
+    "二维码生成 — 本地生成，内容不上传",
+    "SQL参数自动填充 — SQL语句本地处理，数据不泄露"
+  ],
+  "securityFeatures": "所有计算均在用户浏览器本地完成，无后端服务器，无数据收集，无网络请求，完全保护用户隐私。"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -177,6 +215,11 @@ nav {
 }
 .sidebar-waf-link:hover { text-decoration: underline; }
 
+/* WeChat — 内嵌在 sidebar-waf 卡内 */
+.sidebar-wx-divider { height: 1px; background: rgba(0,0,0,.07); margin: 10px 0; }
+.sidebar-wx-label { font-size: 10px; font-weight: 700; color: #15803d; letter-spacing: .04em; margin-bottom: 7px; }
+.sidebar-wx-img { width: 100%; height: auto; border-radius: 7px; display: block; }
+
 /* ===== CONTENT ===== */
 .content { flex: 1; min-width: 0; }
 .tool-view { display: none; }
@@ -297,7 +340,7 @@ label.flabel {
 .ctrl-block-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
 .range-row { display: flex; align-items: center; gap: 10px; }
 input[type=range] {
-  -webkit-appearance: none; flex: 1; height: 4px; background: var(--gray-200);
+  -webkit-appearance: none; appearance: none; flex: 1; height: 4px; background: var(--gray-200);
   border-radius: 2px; outline: none; cursor: pointer;
 }
 input[type=range]::-webkit-slider-thumb {
@@ -585,9 +628,27 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 /* ===== FOOTER ===== */
 footer {
   border-top: 1px solid var(--border); background: var(--white);
-  padding: 24px 24px; text-align: center;
 }
-.footer-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 20px 24px; }
+
+/* WeChat hover popup in footer */
+.footer-wx-entry {
+  font-size: 12px; color: var(--muted); font-weight: 500;
+  cursor: pointer; position: relative; display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 4px; border-radius: 5px; transition: color .15s;
+}
+.footer-wx-entry:hover { color: #16a34a; }
+.footer-wx-popup {
+  display: none; position: absolute; bottom: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 10px;
+  box-shadow: var(--shadow-lg); text-align: center; white-space: nowrap; z-index: 200;
+}
+.footer-wx-popup img { width: 260px; height: auto; border-radius: 6px; display: block; }
+.footer-wx-popup-name { display: block; font-size: 11px; font-weight: 600; color: var(--gray-500); margin-top: 6px; }
+.footer-wx-entry:hover .footer-wx-popup,
+.footer-wx-entry:focus .footer-wx-popup { display: block; }
 .footer-brand { font-weight: 800; font-size: 15px; color: var(--gray-900); }
 .footer-brand span { color: var(--blue); }
 .footer-links { display: flex; gap: 20px; }
@@ -608,6 +669,7 @@ footer {
   .sidebar-items { display: flex; flex-wrap: wrap; gap: 4px; }
   .sidebar-item { width: auto; }
   .sidebar-waf { display: none; }
+  .sidebar-wx-divider, .sidebar-wx-label, .sidebar-wx-img { display: none; }
   .sidebar-label { display: none; }
 }
 </style>
@@ -635,9 +697,9 @@ footer {
 <!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge"><span class="hero-badge-dot"></span>免费开源 · 本地运行 · 零数据上传</div>
+    <div class="hero-badge"><span class="hero-badge-dot"></span>免费开源 · 纯本地运行 · 数据绝不上传</div>
     <h1 class="hero-title">开发者<em>安全工具集</em><br>由 SamWaf 出品</h1>
-    <p class="hero-desc">集合图片处理、编码转换、Hash计算、密码生成等常用工具，所有计算均在浏览器本地完成，数据从不离开你的设备。</p>
+    <p class="hero-desc">图片处理、JSON格式化、Base64、Hash计算、密码生成、二维码、SQL填充等 9 款工具，所有运算<strong>纯浏览器本地执行</strong>，代码、密码、SQL 等敏感数据<strong>绝不离开你的设备</strong>，无后端服务器、无数据收集。</p>
     <div class="hero-actions">
       <a class="btn-primary" href="#tools">🛠 开始使用工具</a>
       <a class="btn-secondary" href="https://github.com/samwafgo/SamWaf" target="_blank">
@@ -646,7 +708,7 @@ footer {
       </a>
     </div>
     <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num"><span id="hc-tools">8</span></div><div class="hstat-label">内置工具</div></div>
+      <div class="hstat"><div class="hstat-num"><span id="hc-tools">9</span></div><div class="hstat-label">内置工具</div></div>
       <div class="hstat-div"></div>
       <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-label">本地运行</div></div>
       <div class="hstat-div"></div>
@@ -675,10 +737,13 @@ footer {
     <button class="sidebar-item" onclick="nav('hash')"><span class="si-icon">🔑</span>Hash 计算</button>
     <button class="sidebar-item" onclick="nav('pw')"><span class="si-icon">🔒</span>密码生成器</button>
 
+    <div class="sidebar-label">数据库</div>
+    <button class="sidebar-item" onclick="nav('sql')"><span class="si-icon">🗄</span>SQL 参数填充</button>
+
     <div class="sidebar-label">生成工具</div>
     <button class="sidebar-item" onclick="nav('qr')"><span class="si-icon">📷</span>二维码生成</button>
 
-    <!-- WAF promo -->
+    <!-- WAF promo + WeChat (合并一卡) -->
     <div class="sidebar-waf">
       <div class="sidebar-waf-name">🛡 SamWaf WAF</div>
       <div class="sidebar-waf-desc">开源轻量级网站防火墙，私有化部署，拦截 SQL注入、XSS、扫描器攻击。</div>
@@ -1096,8 +1161,121 @@ footer {
       </div>
     </div><!-- /qr -->
 
+    <!-- ====== SQL 参数填充 ====== -->
+    <div id="view-sql" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#f0f9ff">🗄</div>
+          <div>
+            <div class="tool-card-title">SQL 参数自动填充</div>
+            <div class="tool-card-sub">Java ? 占位符 · 参数自动替换 · 生成可执行 SQL</div>
+          </div>
+          <span class="tool-card-badge ftag blue">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="frow">
+            <div class="fgroup">
+              <label class="flabel">含 ? 占位符的 SQL</label>
+              <textarea class="ftextarea" id="sql-in" style="min-height:180px" placeholder="粘贴带 ? 的 SQL&#10;&#10;示例：&#10;SELECT * FROM user WHERE id = ? AND name = ? AND active = ?"></textarea>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Java 打印的参数（逗号分隔）</label>
+              <textarea class="ftextarea" id="sql-params" style="min-height:180px" placeholder="粘贴参数值，逗号分隔&#10;&#10;示例：&#10;1,'张三',true"></textarea>
+            </div>
+          </div>
+          <div class="fbtns">
+            <button class="fbtn blue" onclick="mergeSQL()">🔗 生成完整 SQL</button>
+            <button class="fbtn red" onclick="sqlClear()">清空</button>
+          </div>
+          <div id="sql-st" class="fresult" style="display:none"></div>
+          <div id="sql-result-wrap" style="display:none;margin-top:12px">
+            <label class="flabel">生成结果</label>
+            <textarea class="ftextarea" id="sql-result" readonly style="min-height:120px;background:var(--gray-50)"></textarea>
+            <div class="copy-row"><button class="copy-btn" onclick="copyEl('sql-result')">复制结果</button></div>
+          </div>
+          <div class="fdiv"></div>
+          <div style="background:var(--amber-l);border:1px solid #fde68a;border-radius:8px;padding:12px 14px;font-size:12px;color:var(--gray-700);line-height:1.8">
+            <strong>💡 使用说明</strong><br>
+            · 将 MyBatis / JDBC 日志中带 <code style="font-family:var(--mono);background:rgba(255,255,255,.6);padding:1px 5px;border-radius:3px">?</code> 的 SQL 粘贴到左侧<br>
+            · 将对应参数（字符串/数字/布尔值）粘贴到右侧，以英文逗号分隔<br>
+            · 字符串会自动补充单引号，数字和布尔值保持原样
+          </div>
+        </div>
+      </div>
+    </div><!-- /sql -->
+
   </div><!-- /content -->
 </div><!-- /main -->
+
+<!-- SEO TOOLS OVERVIEW SECTION -->
+<section aria-label="工具列表说明" style="background:var(--white);border-top:1px solid var(--border);padding:48px 24px">
+  <div style="max-width:1160px;margin:0 auto">
+    <h2 style="font-size:22px;font-weight:800;color:var(--gray-900);letter-spacing:-.02em;margin-bottom:8px">全部免费开发者工具</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">所有工具均在浏览器本地运行，无需注册，数据零上传，开箱即用。</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--green-l);border:1px solid #a7f3d0;border-radius:9px;font-size:13px;font-weight:600;color:#065f46">
+        <span style="font-size:16px">🔒</span> 纯本地运算，零网络请求
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--blue-l);border:1px solid #bfdbfe;border-radius:9px;font-size:13px;font-weight:600;color:#1e40af">
+        <span style="font-size:16px">🛡</span> 代码 / 密码 / SQL 不离开设备
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--amber-l);border:1px solid #fde68a;border-radius:9px;font-size:13px;font-weight:600;color:#92400e">
+        <span style="font-size:16px">📡</span> 无后端服务器，无数据收集
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--gray-100);border:1px solid var(--border);border-radius:9px;font-size:13px;font-weight:600;color:var(--gray-700)">
+        <span style="font-size:16px">✅</span> 无需注册，完全免费
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🖼 图片工具</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线压缩 JPG/PNG/WebP 图片，支持批量处理；将多张图片合并为一张（上下/左右/网格）；批量旋转图片并下载。全程本地处理，不上传服务器。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">📋 JSON 格式化 / 校验</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线 JSON 格式化与美化，支持语法高亮、树形视图浏览、表格模式查看、JSON 压缩和语法校验，可直接导出 CSV 文件。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🔤 Base64 编解码</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">Base64 在线编码与解码工具，完整支持 Unicode 中文字符，双向转换，结果一键复制。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🔗 URL 编解码</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">URL 在线编码（encodeURIComponent）与解码工具，支持中文 URL 双向转换，适合接口调试和参数处理。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">⏱ 时间戳转换</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">Unix 时间戳在线转换工具，实时显示当前时间戳，支持秒/毫秒时间戳转日期、日期转时间戳双向转换。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🔑 Hash 计算</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线计算 MD5、SHA-1、SHA-256、SHA-512 哈希值，使用 Web Crypto API 纯本地计算，文本内容绝不发送至服务器，支持多算法同时输出。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🔒 密码生成器</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">使用加密安全随机数（Web Crypto API）在浏览器本地生成强密码，密码从不上传或传输，支持自定义长度（6-64位）、大小写字母、数字、特殊字符，实时强度评估，支持批量生成。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">📷 二维码生成</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线生成二维码，支持自定义前景色/背景色、尺寸（128-1024px）、纠错级别，即时预览并下载 PNG 格式图片。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🗄 SQL 参数自动填充</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">将 MyBatis / JDBC 日志中带 ? 占位符的 SQL 与参数值合并，自动识别字符串、数字、布尔类型，快速生成可直接执行的完整 SQL 语句。SQL 内容纯本地处理，数据库结构与业务数据不会泄露。</p>
+      </article>
+
+    </div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer>
@@ -1108,6 +1286,13 @@ footer {
       <a class="footer-link" href="https://gitee.com/samwaf/SamWaf" target="_blank">Gitee</a>
       <a class="footer-link" href="https://doc.samwaf.com" target="_blank">文档</a>
       <a class="footer-link" href="https://hub.docker.com/r/samwaf/samwaf" target="_blank">Docker</a>
+      <span class="footer-wx-entry" tabindex="0">
+        💬 微信公众号
+        <span class="footer-wx-popup">
+          <img src="img/mp_samwaf.png" alt="SamWaf开源防火墙 微信公众号">
+          <span class="footer-wx-popup-name">SamWaf开源防火墙</span>
+        </span>
+      </span>
     </div>
     <div class="footer-copy">© 2024 SamWaf · Apache 2.0 · 工具数据本地处理，零上传</div>
   </div>
@@ -1732,6 +1917,64 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// ===== SQL 参数填充 =====
+function mergeSQL() {
+  const sql = document.getElementById('sql-in').value.trim();
+  const paramText = document.getElementById('sql-params').value.trim();
+  if (!sql || !paramText) {
+    showSt('sql-st', '✕ SQL 和参数都不能为空', false);
+    return;
+  }
+  const params = parseParams(paramText);
+  const questionCount = (sql.match(/\?/g) || []).length;
+  if (params.length !== questionCount) {
+    showSt('sql-st', `✕ 参数数量不匹配：SQL 中有 ${questionCount} 个 ?，但提供了 ${params.length} 个参数`, false);
+    return;
+  }
+  let idx = 0;
+  const finalSQL = sql.replace(/\?/g, () => params[idx++]);
+  document.getElementById('sql-result').value = finalSQL;
+  document.getElementById('sql-result-wrap').style.display = 'block';
+  showSt('sql-st', `✓ 已成功替换 ${params.length} 个参数`, true);
+}
+
+function parseParams(text) {
+  const result = [];
+  let i = 0;
+  while (i < text.length) {
+    while (i < text.length && text[i] === ' ') i++;
+    if (i >= text.length) break;
+    if (text[i] === "'" || text[i] === '"') {
+      const quote = text[i]; i++;
+      let s = '';
+      while (i < text.length) {
+        if (text[i] === quote && text[i+1] === quote) { s += quote; i += 2; }
+        else if (text[i] === quote) { i++; break; }
+        else { s += text[i++]; }
+      }
+      result.push("'" + s.replace(/'/g, "''") + "'");
+    } else {
+      let token = '';
+      while (i < text.length && text[i] !== ',') token += text[i++];
+      token = token.trim();
+      if (token === 'true' || token === 'false' || token === 'null') result.push(token);
+      else if (!isNaN(token) && token !== '') result.push(token);
+      else result.push("'" + token.replace(/'/g, "''") + "'");
+    }
+    while (i < text.length && text[i] === ' ') i++;
+    if (i < text.length && text[i] === ',') i++;
+  }
+  return result;
+}
+
+function sqlClear() {
+  document.getElementById('sql-in').value = '';
+  document.getElementById('sql-params').value = '';
+  document.getElementById('sql-result').value = '';
+  document.getElementById('sql-result-wrap').style.display = 'none';
+  document.getElementById('sql-st').style.display = 'none';
+}
 
 // ===== Shared copy =====
 function copyEl(id){const el=document.getElementById(id);const t=el.value!==undefined?el.value:el.innerText;navigator.clipboard.writeText(t);}
