@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SamWaf Tools — 纯本地开发者工具集 | 数据不上传 JSON格式化 Base64 Hash 二维码 SQL</title>
-<meta name="description" content="SamWaf Tools：9款免费开发者工具，JSON格式化、Base64编解码、Hash计算（MD5/SHA）、密码生成、二维码生成、SQL参数填充等。所有运算纯浏览器本地执行，代码/密码/SQL等敏感数据绝不离开你的设备，零服务器上传，安全可靠。">
+<meta name="description" content="SamWaf Tools：10款免费开发者工具，JSON格式化、Base64编解码、Hash计算（MD5/SHA）、密码生成、二维码生成、代码对比、SQL参数填充等。所有运算纯浏览器本地执行，代码/密码/SQL等敏感数据绝不离开你的设备，零服务器上传，安全可靠。">
 <meta name="keywords" content="本地运行开发工具,纯前端工具,数据不上传,隐私安全工具,JSON格式化,Base64编解码,Hash计算,MD5,SHA256,密码生成器,二维码生成,URL编码,时间戳转换,SQL参数填充,离线开发工具,SamWaf">
 <meta name="author" content="SamWaf">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SamWaf Tools — 纯本地运行，数据绝不上传的开发者工具集">
-<meta property="og:description" content="9款免费开发者工具：JSON格式化、Base64、Hash、密码生成、二维码、SQL参数填充。纯浏览器本地计算，代码与敏感数据零上传，安全可靠。">
+<meta property="og:description" content="10款免费开发者工具：JSON格式化、Base64、Hash、密码生成、二维码、代码对比、SQL参数填充。纯浏览器本地计算，代码与敏感数据零上传，安全可靠。">
 <meta property="og:url" content="https://samwaf.com/">
 <meta property="og:site_name" content="SamWaf Tools">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SamWaf Tools — 纯本地运行，数据绝不上传">
-<meta name="twitter:description" content="9款免费开发者工具，JSON/Base64/Hash/密码/二维码/SQL，纯浏览器本地计算，敏感数据零上传，安全可靠。">
+<meta name="twitter:description" content="10款免费开发者工具，JSON/Base64/Hash/密码/二维码/代码对比/SQL，纯浏览器本地计算，敏感数据零上传，安全可靠。">
 <link rel="canonical" href="https://samwaf.com/">
 <script type="application/ld+json">
 {
@@ -23,7 +23,7 @@
   "@type": "WebApplication",
   "name": "SamWaf Tools",
   "url": "https://samwaf.com/",
-  "description": "9款免费在线开发者工具，包含JSON格式化、Base64编解码、Hash计算、密码生成器、二维码生成、SQL参数填充等。所有运算纯浏览器本地执行，代码、密码、SQL等敏感数据绝不上传至任何服务器，安全可靠，保护隐私。",
+  "description": "10款免费在线开发者工具，包含JSON格式化、Base64编解码、Hash计算、密码生成器、二维码生成、代码对比、SQL参数填充等。所有运算纯浏览器本地执行，代码、密码、SQL等敏感数据绝不上传至任何服务器，安全可靠，保护隐私。",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
@@ -37,6 +37,7 @@
     "Hash计算（MD5/SHA-1/SHA-256/SHA-512）— 密码/文本本地哈希",
     "安全密码生成器 — 加密随机，密码不传输",
     "二维码生成 — 本地生成，内容不上传",
+    "代码对比 — 左右两侧代码差异本地比对，行内高亮",
     "SQL参数自动填充 — SQL语句本地处理，数据不泄露"
   ],
   "securityFeatures": "所有计算均在用户浏览器本地完成，无后端服务器，无数据收集，无网络请求，完全保护用户隐私。"
@@ -625,6 +626,44 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 .qr-ec-btn.active { background: var(--teal-l); border-color: var(--teal); color: var(--teal); }
 
+/* ===== CODE DIFF ===== */
+.diff-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:680px){ .diff-inputs{grid-template-columns:1fr} }
+.diff-ta { min-height: 200px; font-size: 12.5px; line-height: 1.6; white-space: pre; overflow-wrap: normal; }
+.diff-stats { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+.diff-stat {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
+  border-radius: 20px; font-size: 12px; font-weight: 600; font-family: var(--mono);
+}
+.diff-stat.add { background: var(--green-l); color: var(--green); }
+.diff-stat.del { background: var(--red-l); color: var(--red); }
+.diff-stat.same { background: var(--gray-100); color: var(--gray-500); }
+.diff-wrap {
+  display: none; margin-top: 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.diff-wrap.show { display: block; }
+.diff-scroll { overflow-x: auto; max-height: 540px; overflow-y: auto; }
+.diff-table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12.5px; }
+.diff-table td { padding: 0; vertical-align: top; }
+.diff-ln {
+  user-select: none; text-align: right; padding: 1px 8px; width: 1%;
+  white-space: nowrap; color: var(--gray-400); font-size: 11px;
+  background: var(--gray-50); border-right: 1px solid var(--border);
+}
+.diff-code { padding: 1px 12px; white-space: pre-wrap; word-break: break-word; }
+.diff-mid { width: 18px; text-align: center; color: var(--gray-300); user-select: none; background: var(--gray-50); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+.diff-row.eq td { background: var(--white); }
+td.d-del { background: #fef2f2; }
+td.d-add { background: #f0fdf4; }
+td.diff-code.d-del { color: #991b1b; }
+td.diff-code.d-add { color: #065f46; }
+.diff-empty { background: repeating-linear-gradient(45deg, var(--gray-50), var(--gray-50) 6px, var(--gray-100) 6px, var(--gray-100) 12px); }
+.diff-code mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
+td.d-add mark { background: #86efac; }
+td.d-del mark { background: #fca5a5; }
+.diff-equal-note { padding: 14px; text-align: center; color: var(--green); font-size: 13px; font-weight: 600; }
+
 /* ===== FOOTER ===== */
 footer {
   border-top: 1px solid var(--border); background: var(--white);
@@ -699,7 +738,7 @@ footer {
   <div class="hero-inner">
     <div class="hero-badge"><span class="hero-badge-dot"></span>免费开源 · 纯本地运行 · 数据绝不上传</div>
     <h1 class="hero-title">开发者<em>安全工具集</em><br>由 SamWaf 出品</h1>
-    <p class="hero-desc">图片处理、JSON格式化、Base64、Hash计算、密码生成、二维码、SQL填充等 9 款工具，所有运算<strong>纯浏览器本地执行</strong>，代码、密码、SQL 等敏感数据<strong>绝不离开你的设备</strong>，无后端服务器、无数据收集。</p>
+    <p class="hero-desc">图片处理、JSON格式化、Base64、Hash计算、密码生成、二维码、代码对比、SQL填充等 10 款工具，所有运算<strong>纯浏览器本地执行</strong>，代码、密码、SQL 等敏感数据<strong>绝不离开你的设备</strong>，无后端服务器、无数据收集。</p>
     <div class="hero-actions">
       <a class="btn-primary" href="#tools">🛠 开始使用工具</a>
       <a class="btn-secondary" href="https://github.com/samwafgo/SamWaf" target="_blank">
@@ -708,7 +747,7 @@ footer {
       </a>
     </div>
     <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num"><span id="hc-tools">9</span></div><div class="hstat-label">内置工具</div></div>
+      <div class="hstat"><div class="hstat-num"><span id="hc-tools">10</span></div><div class="hstat-label">内置工具</div></div>
       <div class="hstat-div"></div>
       <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-label">本地运行</div></div>
       <div class="hstat-div"></div>
@@ -739,6 +778,9 @@ footer {
 
     <div class="sidebar-label">数据库</div>
     <button class="sidebar-item" onclick="nav('sql')"><span class="si-icon">🗄</span>SQL 参数填充</button>
+
+    <div class="sidebar-label">文本 / 对比</div>
+    <button class="sidebar-item" onclick="nav('diff')"><span class="si-icon">🔀</span>代码对比</button>
 
     <div class="sidebar-label">生成工具</div>
     <button class="sidebar-item" onclick="nav('qr')"><span class="si-icon">📷</span>二维码生成</button>
@@ -1204,6 +1246,49 @@ footer {
       </div>
     </div><!-- /sql -->
 
+    <!-- ====== CODE DIFF ====== -->
+    <div id="view-diff" class="tool-view">
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-icon" style="background:#eef2ff">🔀</div>
+          <div>
+            <div class="tool-card-title">代码对比</div>
+            <div class="tool-card-sub">左右两侧文本逐行差异 · 行内高亮 · 本地处理</div>
+          </div>
+          <span class="tool-card-badge ftag blue">本地运行</span>
+        </div>
+        <div class="tool-card-body">
+          <div class="diff-inputs">
+            <div class="fgroup">
+              <label class="flabel">左侧（原始）</label>
+              <textarea class="ftextarea diff-ta" id="diff-l" placeholder="粘贴左侧代码 / 文本…"></textarea>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">右侧（对比）</label>
+              <textarea class="ftextarea diff-ta" id="diff-r" placeholder="粘贴右侧代码 / 文本…"></textarea>
+            </div>
+          </div>
+          <div class="fbtns">
+            <button class="fbtn blue" onclick="runDiff()">🔍 对比差异</button>
+            <button class="fbtn" onclick="swapDiff()">⇄ 交换左右</button>
+            <button class="fbtn red" onclick="clearDiff()">清空</button>
+            <label class="pw-opt" style="margin-left:6px"><input type="checkbox" id="diff-ws">忽略空白差异</label>
+          </div>
+          <div class="diff-stats" id="diff-stats" style="display:none">
+            <span class="diff-stat add">+ <span id="diff-nadd">0</span> 新增</span>
+            <span class="diff-stat del">− <span id="diff-ndel">0</span> 删除</span>
+            <span class="diff-stat same"><span id="diff-nsame">0</span> 相同</span>
+          </div>
+          <div id="diff-st" class="fresult" style="display:none"></div>
+          <div class="diff-wrap" id="diff-wrap">
+            <div class="diff-scroll">
+              <table class="diff-table"><tbody id="diff-body"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /diff -->
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -1266,6 +1351,11 @@ footer {
       <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
         <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">📷 二维码生成</h3>
         <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线生成二维码，支持自定义前景色/背景色、尺寸（128-1024px）、纠错级别，即时预览并下载 PNG 格式图片。</p>
+      </article>
+
+      <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
+        <h3 style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px">🔀 代码对比</h3>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;margin:0">在线对比左右两侧代码 / 文本的差异，基于 LCS 算法逐行比对，左右并排展示新增、删除、修改行，并高亮行内字符级变化，支持忽略空白差异。代码纯本地处理，绝不上传服务器。</p>
       </article>
 
       <article style="padding:18px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--gray-50)">
@@ -1974,6 +2064,152 @@ function sqlClear() {
   document.getElementById('sql-result').value = '';
   document.getElementById('sql-result-wrap').style.display = 'none';
   document.getElementById('sql-st').style.display = 'none';
+}
+
+// ===== Code Diff =====
+function diffEsc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+// LCS-based alignment over key arrays; returns rows {t:'eq'|'del'|'add', l, r, li, ri}
+function diffSeq(ka, kb, a, b){
+  const n=ka.length, m=kb.length;
+  // memory guard: fall back to a coarse split for very large inputs
+  if(n*m > 6000000){
+    const rows=[]; const min=Math.min(n,m);
+    for(let i=0;i<min;i++){
+      if(ka[i]===kb[i]) rows.push({t:'eq',l:a[i],r:b[i],li:i,ri:i});
+      else { rows.push({t:'del',l:a[i],li:i}); rows.push({t:'add',r:b[i],ri:i}); }
+    }
+    for(let i=min;i<n;i++) rows.push({t:'del',l:a[i],li:i});
+    for(let j=min;j<m;j++) rows.push({t:'add',r:b[j],ri:j});
+    return rows;
+  }
+  const dp = Array.from({length:n+1}, ()=>new Int32Array(m+1));
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--){
+    dp[i][j] = ka[i]===kb[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  }
+  const rows=[]; let i=0,j=0;
+  while(i<n && j<m){
+    if(ka[i]===kb[j]){ rows.push({t:'eq',l:a[i],r:b[j],li:i,ri:j}); i++; j++; }
+    else if(dp[i+1][j] >= dp[i][j+1]){ rows.push({t:'del',l:a[i],li:i}); i++; }
+    else { rows.push({t:'add',r:b[j],ri:j}); j++; }
+  }
+  while(i<n){ rows.push({t:'del',l:a[i],li:i}); i++; }
+  while(j<m){ rows.push({t:'add',r:b[j],ri:j}); j++; }
+  return rows;
+}
+
+// char-level inline diff between two lines -> {lh, rh} escaped HTML with <mark>
+function inlineDiff(l, r){
+  const A=[...l], B=[...r], n=A.length, m=B.length;
+  if(n*m > 250000){ return { lh:diffEsc(l), rh:diffEsc(r) }; }
+  const dp = Array.from({length:n+1}, ()=>new Int32Array(m+1));
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--){
+    dp[i][j] = A[i]===B[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  }
+  let i=0, j=0;
+  const ops=[];
+  while(i<n && j<m){
+    if(A[i]===B[j]){ ops.push(['eq',A[i]]); i++; j++; }
+    else if(dp[i+1][j] >= dp[i][j+1]){ ops.push(['del',A[i]]); i++; }
+    else { ops.push(['add',B[j]]); j++; }
+  }
+  while(i<n){ ops.push(['del',A[i]]); i++; }
+  while(j<m){ ops.push(['add',B[j]]); j++; }
+  // build per-side HTML, merging adjacent runs into single <mark> spans
+  let lh='', rh='';
+  let lb='', lm='';
+  for(const [op,ch] of ops){
+    if(op==='add') continue;
+    const cur = op==='del' ? 'd' : 'e';
+    if(cur!==lm){ if(lb) lh += lm==='d' ? '<mark>'+diffEsc(lb)+'</mark>' : diffEsc(lb); lb=''; lm=cur; }
+    lb+=ch;
+  }
+  if(lb) lh += lm==='d' ? '<mark>'+diffEsc(lb)+'</mark>' : diffEsc(lb);
+  let rb='', rm='';
+  for(const [op,ch] of ops){
+    if(op==='del') continue;
+    const cur = op==='add' ? 'a' : 'e';
+    if(cur!==rm){ if(rb) rh += rm==='a' ? '<mark>'+diffEsc(rb)+'</mark>' : diffEsc(rb); rb=''; rm=cur; }
+    rb+=ch;
+  }
+  if(rb) rh += rm==='a' ? '<mark>'+diffEsc(rb)+'</mark>' : diffEsc(rb);
+  return { lh, rh };
+}
+
+function runDiff(){
+  const aRaw=document.getElementById('diff-l').value;
+  const bRaw=document.getElementById('diff-r').value;
+  const ignoreWs=document.getElementById('diff-ws').checked;
+  const wrap=document.getElementById('diff-wrap');
+  const body=document.getElementById('diff-body');
+  const stats=document.getElementById('diff-stats');
+  if(!aRaw && !bRaw){ showSt('diff-st','请先在左右两侧输入内容',false); wrap.classList.remove('show'); stats.style.display='none'; return; }
+  document.getElementById('diff-st').style.display='none';
+
+  const a=aRaw.split('\n'), b=bRaw.split('\n');
+  const norm = ignoreWs ? (s=>s.replace(/\s+/g,' ').trim()) : (s=>s);
+  const ka=a.map(norm), kb=b.map(norm);
+  const rows=diffSeq(ka, kb, a, b);
+
+  // pair consecutive del/add blocks for side-by-side replace view
+  let nAdd=0, nDel=0, nSame=0;
+  let html='';
+  let delBuf=[], addBuf=[];
+  function flush(){
+    const max=Math.max(delBuf.length, addBuf.length);
+    for(let k=0;k<max;k++){
+      const d=delBuf[k], ad=addBuf[k];
+      let lh='', rh='';
+      if(d && ad){ const r=inlineDiff(d.l, ad.r); lh=r.lh; rh=r.rh; }
+      else { if(d) lh=diffEsc(d.l); if(ad) rh=diffEsc(ad.r); }
+      html += '<tr class="diff-row">'
+        + (d ? '<td class="diff-ln d-del">'+(d.li+1)+'</td><td class="diff-code d-del">'+lh+'</td>'
+             : '<td class="diff-ln diff-empty"></td><td class="diff-code diff-empty"></td>')
+        + '<td class="diff-mid">'+(d&&ad?'≠':(d?'−':'+'))+'</td>'
+        + (ad ? '<td class="diff-ln d-add">'+(ad.ri+1)+'</td><td class="diff-code d-add">'+rh+'</td>'
+              : '<td class="diff-ln diff-empty"></td><td class="diff-code diff-empty"></td>')
+        + '</tr>';
+    }
+    delBuf=[]; addBuf=[];
+  }
+  for(const rw of rows){
+    if(rw.t==='eq'){
+      flush(); nSame++;
+      const c=diffEsc(rw.l);
+      html += '<tr class="diff-row eq">'
+        + '<td class="diff-ln">'+(rw.li+1)+'</td><td class="diff-code">'+c+'</td>'
+        + '<td class="diff-mid"></td>'
+        + '<td class="diff-ln">'+(rw.ri+1)+'</td><td class="diff-code">'+c+'</td>'
+        + '</tr>';
+    } else if(rw.t==='del'){ nDel++; delBuf.push(rw); }
+    else { nAdd++; addBuf.push(rw); }
+  }
+  flush();
+
+  document.getElementById('diff-nadd').textContent=nAdd;
+  document.getElementById('diff-ndel').textContent=nDel;
+  document.getElementById('diff-nsame').textContent=nSame;
+  stats.style.display='flex';
+
+  if(nAdd===0 && nDel===0){
+    body.innerHTML='<tr><td colspan="5"><div class="diff-equal-note">✓ 两侧内容完全一致</div></td></tr>';
+  } else {
+    body.innerHTML=html;
+  }
+  wrap.classList.add('show');
+}
+
+function swapDiff(){
+  const l=document.getElementById('diff-l'), r=document.getElementById('diff-r');
+  const t=l.value; l.value=r.value; r.value=t;
+  if(document.getElementById('diff-wrap').classList.contains('show')) runDiff();
+}
+function clearDiff(){
+  document.getElementById('diff-l').value='';
+  document.getElementById('diff-r').value='';
+  document.getElementById('diff-wrap').classList.remove('show');
+  document.getElementById('diff-stats').style.display='none';
+  document.getElementById('diff-st').style.display='none';
 }
 
 // ===== Shared copy =====
