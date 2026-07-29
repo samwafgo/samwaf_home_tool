@@ -640,10 +640,63 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .diff-stat.same { background: var(--gray-100); color: var(--gray-500); }
 .diff-wrap {
   display: none; margin-top: 12px; border: 1.5px solid var(--border);
-  border-radius: 8px; overflow: hidden;
+  border-radius: 8px; overflow: hidden; background: var(--white);
 }
 .diff-wrap.show { display: block; }
-.diff-scroll { overflow-x: auto; max-height: 540px; overflow-y: auto; }
+
+/* diff result toolbar: fullscreen + jump-to-diff navigation */
+.diff-toolbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 7px 10px; background: var(--gray-50); border-bottom: 1px solid var(--border);
+}
+.diff-tbtn {
+  display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px;
+  font-size: 12px; font-weight: 600; font-family: inherit; line-height: 1.4;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: var(--white); color: var(--gray-700); cursor: pointer; transition: all .15s;
+}
+.diff-tbtn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+.diff-tbtn:disabled { opacity: .4; cursor: not-allowed; }
+.diff-tbtn.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.diff-tsep { width: 1px; height: 18px; background: var(--border); margin: 0 3px; }
+.diff-tpos { font-family: var(--mono); font-size: 12px; color: var(--gray-500); padding: 0 4px; white-space: nowrap; }
+.diff-tstat { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--gray-500); white-space: nowrap; }
+.diff-tstat b { font-weight: 700; }
+.diff-tstat .a { color: var(--green); }
+.diff-tstat .d { color: var(--red); }
+
+/* left anchor rail (minimap of diff chunks) */
+.diff-body-area { display: flex; align-items: stretch; min-height: 0; }
+.diff-rail {
+  position: relative; flex: 0 0 16px; width: 16px; cursor: pointer;
+  background: var(--gray-100); border-right: 1px solid var(--border);
+}
+.diff-rail-mark {
+  position: absolute; left: 2px; right: 2px; min-height: 3px;
+  border-radius: 2px; opacity: .72; transition: opacity .12s;
+}
+.diff-rail-mark:hover { opacity: 1; left: 1px; right: 1px; }
+.diff-rail-mark.act { opacity: 1; box-shadow: 0 0 0 1.5px var(--gray-700); }
+.diff-rail-mark.add { background: #22c55e; }
+.diff-rail-mark.del { background: #ef4444; }
+.diff-rail-mark.chg { background: #f59e0b; }
+.diff-rail-view {
+  position: absolute; left: 0; right: 0; min-height: 6px; pointer-events: none;
+  background: rgba(37,99,235,.16);
+  border-top: 1px solid rgba(37,99,235,.45); border-bottom: 1px solid rgba(37,99,235,.45);
+}
+.diff-scroll { position: relative; flex: 1; min-width: 0; overflow-x: auto; max-height: 540px; overflow-y: auto; }
+tr.chunk-active > td { box-shadow: inset 0 0 0 100vmax rgba(37,99,235,.07); }
+tr.chunk-active > td:first-child { box-shadow: inset 3px 0 0 var(--blue), inset 0 0 0 100vmax rgba(37,99,235,.07); }
+
+/* fullscreen overlay mode */
+.diff-wrap.fs {
+  position: fixed; inset: 0; z-index: 900; margin: 0;
+  border: 0; border-radius: 0; display: flex; flex-direction: column;
+}
+.diff-wrap.fs .diff-body-area { flex: 1; min-height: 0; }
+.diff-wrap.fs .diff-scroll { max-height: none; height: 100%; }
+body.diff-fs-open { overflow: hidden; }
 .diff-table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12.5px; }
 .diff-table td { padding: 0; vertical-align: top; }
 .diff-ln {
@@ -1281,8 +1334,19 @@ footer {
           </div>
           <div id="diff-st" class="fresult" style="display:none"></div>
           <div class="diff-wrap" id="diff-wrap">
-            <div class="diff-scroll">
-              <table class="diff-table"><tbody id="diff-body"></tbody></table>
+            <div class="diff-toolbar">
+              <button class="diff-tbtn" id="diff-fs-btn" onclick="toggleDiffFs()" title="全屏显示对比结果（Esc 退出）">⛶ 全屏</button>
+              <span class="diff-tsep"></span>
+              <button class="diff-tbtn" id="diff-prev" onclick="diffJump(-1)" title="上一处差异（快捷键 P）">↑ 上一处</button>
+              <button class="diff-tbtn" id="diff-next" onclick="diffJump(1)" title="下一处差异（快捷键 N）">↓ 下一处</button>
+              <span class="diff-tpos" id="diff-pos">0 / 0</span>
+              <span class="diff-tstat" id="diff-tstat"></span>
+            </div>
+            <div class="diff-body-area">
+              <div class="diff-rail" id="diff-rail" title="差异锚点，点击跳转"><div class="diff-rail-view" id="diff-railview"></div></div>
+              <div class="diff-scroll" id="diff-scroll">
+                <table class="diff-table"><tbody id="diff-body"></tbody></table>
+              </div>
             </div>
           </div>
         </div>
@@ -1399,6 +1463,8 @@ const S = {
 
 // ===== Navigation =====
 function nav(id) {
+  const dw=document.getElementById('diff-wrap');
+  if(id!=='diff' && dw && dw.classList.contains('fs')) toggleDiffFs();
   document.querySelectorAll('.tool-view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
@@ -2157,12 +2223,18 @@ function runDiff(){
   let delBuf=[], addBuf=[];
   function flush(){
     const max=Math.max(delBuf.length, addBuf.length);
+    if(!max){ delBuf=[]; addBuf=[]; return; }
+    // each flush() emits one contiguous diff chunk -> mark its first row as an anchor
+    const kind = (delBuf.length && addBuf.length) ? 'chg' : (delBuf.length ? 'del' : 'add');
+    const firstLn = delBuf.length ? (delBuf[0].li+1) : (addBuf[0].ri+1);
     for(let k=0;k<max;k++){
       const d=delBuf[k], ad=addBuf[k];
       let lh='', rh='';
       if(d && ad){ const r=inlineDiff(d.l, ad.r); lh=r.lh; rh=r.rh; }
       else { if(d) lh=diffEsc(d.l); if(ad) rh=diffEsc(ad.r); }
-      html += '<tr class="diff-row">'
+      html += (k===0
+          ? '<tr class="diff-row chunk-start" data-kind="'+kind+'" data-rows="'+max+'" data-line="'+firstLn+'">'
+          : '<tr class="diff-row">')
         + (d ? '<td class="diff-ln d-del">'+(d.li+1)+'</td><td class="diff-code d-del">'+lh+'</td>'
              : '<td class="diff-ln diff-empty"></td><td class="diff-code diff-empty"></td>')
         + '<td class="diff-mid">'+(d&&ad?'≠':(d?'−':'+'))+'</td>'
@@ -2190,6 +2262,8 @@ function runDiff(){
   document.getElementById('diff-ndel').textContent=nDel;
   document.getElementById('diff-nsame').textContent=nSame;
   stats.style.display='flex';
+  document.getElementById('diff-tstat').innerHTML =
+    '<span class="a">+<b>'+nAdd+'</b></span> &nbsp;<span class="d">−<b>'+nDel+'</b></span> &nbsp;·&nbsp; '+nSame+' 相同';
 
   if(nAdd===0 && nDel===0){
     body.innerHTML='<tr><td colspan="5"><div class="diff-equal-note">✓ 两侧内容完全一致</div></td></tr>';
@@ -2197,6 +2271,20 @@ function runDiff(){
     body.innerHTML=html;
   }
   wrap.classList.add('show');
+
+  // rebuild anchors, then auto-jump to the first difference
+  diffCur=-1;
+  buildDiffRail();
+  if(diffChunks.length){
+    diffGoto(0, true);
+    // bring the result panel itself into view if it sits off-screen
+    if(!wrap.classList.contains('fs')){
+      const r=wrap.getBoundingClientRect();
+      if(r.top>window.innerHeight-120 || r.bottom<120){
+        try{ wrap.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ wrap.scrollIntoView(); }
+      }
+    }
+  }
 }
 
 function swapDiff(){
@@ -2207,10 +2295,119 @@ function swapDiff(){
 function clearDiff(){
   document.getElementById('diff-l').value='';
   document.getElementById('diff-r').value='';
+  if(document.getElementById('diff-wrap').classList.contains('fs')) toggleDiffFs();
   document.getElementById('diff-wrap').classList.remove('show');
   document.getElementById('diff-stats').style.display='none';
   document.getElementById('diff-st').style.display='none';
+  document.getElementById('diff-body').innerHTML='';
+  diffChunks=[]; diffCur=-1;
+  buildDiffRail();
 }
+
+// ===== Diff anchors / jump / fullscreen =====
+let diffChunks=[], diffCur=-1;
+
+function buildDiffRail(){
+  const scroll=document.getElementById('diff-scroll');
+  const rail=document.getElementById('diff-rail');
+  if(!scroll||!rail) return;
+  diffChunks=[].slice.call(document.querySelectorAll('#diff-body tr.chunk-start'));
+  [].slice.call(rail.querySelectorAll('.diff-rail-mark')).forEach(el=>el.remove());
+  const total=scroll.scrollHeight||1;
+  diffChunks.forEach((tr,i)=>{
+    const rows=parseInt(tr.dataset.rows||'1',10);
+    const h=(tr.offsetHeight||18)*rows;
+    const m=document.createElement('div');
+    m.className='diff-rail-mark '+(tr.dataset.kind||'chg');
+    m.style.top=Math.min(99, tr.offsetTop/total*100)+'%';
+    m.style.height=Math.max(0.5, h/total*100)+'%';
+    m.title='第 '+(i+1)+' 处差异 · 第 '+tr.dataset.line+' 行';
+    m.addEventListener('click', e=>{ e.stopPropagation(); diffGoto(i); });
+    rail.appendChild(m);
+  });
+  updateDiffPos();
+  updateRailView();
+}
+
+function diffGoto(i, instant){
+  if(!diffChunks.length) return;
+  if(i<0) i=diffChunks.length-1;
+  if(i>=diffChunks.length) i=0;
+  diffCur=i;
+  const scroll=document.getElementById('diff-scroll');
+  const tr=diffChunks[i];
+  const top=Math.max(0, tr.offsetTop - Math.round(scroll.clientHeight*0.28));
+  if(instant) scroll.scrollTop=top;
+  else { try{ scroll.scrollTo({top:top, behavior:'smooth'}); }catch(e){ scroll.scrollTop=top; } }
+  [].slice.call(document.querySelectorAll('#diff-body tr.chunk-active')).forEach(el=>el.classList.remove('chunk-active'));
+  let el=tr;
+  for(let k=0, n=parseInt(tr.dataset.rows||'1',10); k<n && el; k++){ el.classList.add('chunk-active'); el=el.nextElementSibling; }
+  updateDiffPos();
+}
+
+function diffJump(dir){ if(diffChunks.length) diffGoto(diffCur<0 ? (dir>0?0:diffChunks.length-1) : diffCur+dir); }
+
+function updateDiffPos(){
+  const n=diffChunks.length;
+  document.getElementById('diff-pos').textContent=(n? (diffCur+1)+' / '+n+' 处差异' : '无差异');
+  document.getElementById('diff-prev').disabled=!n;
+  document.getElementById('diff-next').disabled=!n;
+  const marks=document.querySelectorAll('#diff-rail .diff-rail-mark');
+  marks.forEach((m,i)=>m.classList.toggle('act', i===diffCur));
+}
+
+function updateRailView(){
+  const scroll=document.getElementById('diff-scroll');
+  const view=document.getElementById('diff-railview');
+  if(!scroll||!view) return;
+  const total=scroll.scrollHeight||1;
+  view.style.top=(scroll.scrollTop/total*100)+'%';
+  view.style.height=(scroll.clientHeight/total*100)+'%';
+}
+
+function toggleDiffFs(){
+  const wrap=document.getElementById('diff-wrap');
+  const on=wrap.classList.toggle('fs');
+  document.body.classList.toggle('diff-fs-open', on);
+  const btn=document.getElementById('diff-fs-btn');
+  btn.textContent = on ? '⛶ 退出全屏' : '⛶ 全屏';
+  btn.classList.toggle('on', on);
+  // layout changed -> recompute anchor positions, keep current chunk in view
+  setTimeout(()=>{ buildDiffRail(); if(diffCur>=0) diffGoto(diffCur, true); }, 50);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const scroll=document.getElementById('diff-scroll');
+  const rail=document.getElementById('diff-rail');
+  if(scroll){
+    let tick=false;
+    scroll.addEventListener('scroll', ()=>{
+      if(tick) return; tick=true;
+      requestAnimationFrame(()=>{ tick=false; updateRailView(); });
+    }, {passive:true});
+  }
+  // click on blank rail area -> proportional scroll
+  if(rail) rail.addEventListener('click', e=>{
+    if(!diffChunks.length || e.target!==rail) return;
+    const r=rail.getBoundingClientRect();
+    const ratio=(e.clientY-r.top)/(r.height||1);
+    scroll.scrollTop=Math.max(0, scroll.scrollHeight*ratio - scroll.clientHeight/2);
+  });
+  window.addEventListener('resize', ()=>{ if(diffChunks.length) buildDiffRail(); });
+});
+
+document.addEventListener('keydown', e=>{
+  const wrap=document.getElementById('diff-wrap');
+  if(!wrap || !wrap.classList.contains('show')) return;
+  if(e.key==='Escape' && wrap.classList.contains('fs')){ toggleDiffFs(); return; }
+  const view=document.getElementById('view-diff');
+  if(!wrap.classList.contains('fs') && !(view&&view.classList.contains('active'))) return;
+  const t=e.target, tag=t&&t.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||(t&&t.isContentEditable)) return;
+  if(e.ctrlKey||e.altKey||e.metaKey) return;
+  if(e.key==='n'||e.key==='N'){ e.preventDefault(); diffJump(1); }
+  else if(e.key==='p'||e.key==='P'){ e.preventDefault(); diffJump(-1); }
+});
 
 // ===== Shared copy =====
 function copyEl(id){const el=document.getElementById(id);const t=el.value!==undefined?el.value:el.innerText;navigator.clipboard.writeText(t);}
